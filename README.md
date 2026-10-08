@@ -15,14 +15,8 @@ JShell/
 ├── index.html
 ├── style.css
 ├── app.js
-├── README.md
-└── packages/
-    ├── index.json
-    └── example/
-        ├── manifest.json
-        ├── index.html
-        ├── style.css
-        └── app.js
+└── README.md
+
 ```
 
 GitHub Pages can publish the repository as a static site while JShell provides the terminal-style OS experience in the browser.
@@ -71,58 +65,6 @@ execute app/html "<!DOCTYPE JShellApp><body>...</body>" -n -f -c
 ```
 
 `app/html` requires `<!DOCTYPE JShellApp>` at the beginning.
-
-## Package manager
-
-JShell includes a `pkg` command.
-
-Example:
-
-```text
-pkg repo set https://maitononaka.github.io/Termos/packages/
-pkg update
-pkg search
-pkg install example
-pkg list
-pkg run example
-pkg remove example
-```
-
-The package repository index is:
-
-```text
-https://maitononaka.github.io/Termos/packages/index.json
-```
-
-## Creating a package
-
-A package contains a `manifest.json` and its application files.
-
-```text
-packages/
-└── myapp/
-    ├── manifest.json
-    ├── index.html
-    ├── style.css
-    └── app.js
-```
-
-Example `manifest.json`:
-
-```json
-{
-  "name": "myapp",
-  "version": "1.0.0",
-  "description": "My JShell application",
-  "entry": "index.html",
-  "files": [
-    "manifest.json",
-    "index.html",
-    "style.css",
-    "app.js"
-  ]
-}
-```
 
 ## Pause
 
