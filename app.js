@@ -1,14 +1,14 @@
 const DB_KEY='termos-state-v1';
-const JSHELL_VERSION='1.3.1';
+const JSHELL_VERSION='1.3.2';
 const defaultState=()=>({
   user:null, passwordHash:null, passwordDisabled:false,
   registry:{
     'HKEY_LOCAL_MACHINE':{'SYSTEM':{'Boot':{'BootDelay':'1200','SecureBoot':'Enabled'},'Display':{'Theme':'green','MaxClock':'100'}}},
-    'HKEY_CURRENT_USER':{'Software':{'JShell':{'Version':'1.3.1','FirstBoot':'true'}}}
+    'HKEY_CURRENT_USER':{'Software':{'JShell':{'Version':'1.3.2','FirstBoot':'true'}}}
   },
   fs:{type:'dir',name:'/',children:{
     home:{type:'dir',name:'home',children:{}},
-    etc:{type:'dir',name:'etc',children:{'os-release':{type:'file',name:'os-release',content:'NAME=JShell\nVERSION=1.3.1\nID=jshell\nHTML_BASED=1'}}},
+    etc:{type:'dir',name:'etc',children:{'os-release':{type:'file',name:'os-release',content:'NAME=JShell\nVERSION=1.3.2\nID=jshell\nHTML_BASED=1'}}},
     var:{type:'dir',name:'var',children:{log:{type:'dir',name:'log',children:{'boot.log':{type:'file',name:'boot.log',content:'',owner:'root',group:'root',mode:'0644'}}}}}
   }},
   cwd:'/home', history:[], logs:[], aliases:{},
@@ -427,7 +427,7 @@ class UEFI{
   }
   getItems(){
     if(this.tab==='Main')return [
-      {label:'System Information',value:'JShell 1.3.1'}
+      {label:'System Information',value:'JShell 1.3.2'}
     ];
     if(this.tab==='Advanced')return [
       {label:'Virtual MAX CLOCK',value:this.maxClock+'%',change:(d)=>{this.maxClock=Math.max(10,Math.min(100,this.maxClock+d*5));}}
@@ -480,7 +480,7 @@ class UEFI{
     let lines=[];
     if(this.tab==='Main')lines=[
       'JShell UEFI SETUP UTILITY','',
-      'OS                 JShell 1.3.1',
+      'OS                 JShell 1.3.2',
       'Firmware           UEFI-compatible JavaScript firmware',
       'CPU threads        '+(info.cores==null?'Unavailable':info.cores),
       'Device memory      '+(info.deviceMemory==null?'Unavailable':info.deviceMemory),
@@ -537,8 +537,8 @@ function lockMobileViewport(){keepViewportTop();window.addEventListener('scroll'
 applySettings();
 const info=getHardwareSnapshot();
 let fpsMeter;
-function boot(){show('boot');bootEnterCount=0;bootDone=false;const phases=['POST: CPU topology detected','Memory probe: browser deviceMemory hint','Display init: WebGL','Storage init: localStorage','Runtime init: JavaScript userspace','Kernel init: virtual process manager','JShell: userspace shell ready'];let p=0;bootLog('JShell BIOS 1.3.1 / UEFI-compatible firmware');bootLog('Booting JShell...  press ENTER 3x for UEFI.  press ESC for boot menu.');const onKey=e=>{if(bootDone)return;if(e.key==='Enter'){bootEnterCount++;if(bootEnterCount>=3){bootDone=true;clearInterval(bootTimer);document.removeEventListener('keydown',onKey);openUEFI(false);return}}if(e.key==='Escape'){bootDone=true;clearInterval(bootTimer);document.removeEventListener('keydown',onKey);showGrub();e.preventDefault()}};document.addEventListener('keydown',onKey);bootTimer=setInterval(()=>{if(bootDone)return;if(p<phases.length){bootLog(`[${String(Math.round((p/phases.length)*100)).padStart(3,' ')}%] ${phases[p++]}`)}else{bootDone=true;clearInterval(bootTimer);document.removeEventListener('keydown',onKey);setTimeout(continueBoot,180)}},150)}
-function showGrub(){const grub=$('grub');grub.classList.remove('hidden');const items=['JShell OS 1.3.1','JShell Recovery / Safe Mode','UEFI Firmware Setup','Memory Diagnostic'];let selected=0;const render=()=>{$('grub-items').textContent=items.map((x,i)=>`${i===selected?'>':' '} ${x}`).join('\n')};render();const key=e=>{if(e.key==='ArrowDown'){selected=(selected+1)%items.length;render();e.preventDefault()}if(e.key==='ArrowUp'){selected=(selected+items.length-1)%items.length;render();e.preventDefault()}if(e.key==='F2'){cleanup();openUEFI(false);e.preventDefault()}if(e.key==='Enter'){cleanup();if(selected===2)openUEFI(false);else if(selected===3){bootLog('Memory diagnostic: browser-managed memory only.');setTimeout(()=>showGrub(),300)}else{bootOverride=selected===1?'RecoveryBoot':'JShellMain';continueBoot()}e.preventDefault()}};const cleanup=()=>{document.removeEventListener('keydown',key);grub.classList.add('hidden')};document.addEventListener('keydown',key)}
+function boot(){show('boot');bootEnterCount=0;bootDone=false;const phases=['POST: CPU topology detected','Memory probe: browser deviceMemory hint','Display init: WebGL','Storage init: localStorage','Runtime init: JavaScript userspace','Kernel init: virtual process manager','JShell: userspace shell ready'];let p=0;bootLog('JShell BIOS 1.3.2 / UEFI-compatible firmware');bootLog('Booting JShell...  press ENTER 3x for UEFI.  press ESC for boot menu.');const onKey=e=>{if(bootDone)return;if(e.key==='Enter'){bootEnterCount++;if(bootEnterCount>=3){bootDone=true;clearInterval(bootTimer);document.removeEventListener('keydown',onKey);openUEFI(false);return}}if(e.key==='Escape'){bootDone=true;clearInterval(bootTimer);document.removeEventListener('keydown',onKey);showGrub();e.preventDefault()}};document.addEventListener('keydown',onKey);bootTimer=setInterval(()=>{if(bootDone)return;if(p<phases.length){bootLog(`[${String(Math.round((p/phases.length)*100)).padStart(3,' ')}%] ${phases[p++]}`)}else{bootDone=true;clearInterval(bootTimer);document.removeEventListener('keydown',onKey);setTimeout(continueBoot,180)}},150)}
+function showGrub(){const grub=$('grub');grub.classList.remove('hidden');const items=['JShell OS 1.3.2','JShell Recovery / Safe Mode','UEFI Firmware Setup','Memory Diagnostic'];let selected=0;const render=()=>{$('grub-items').textContent=items.map((x,i)=>`${i===selected?'>':' '} ${x}`).join('\n')};render();const key=e=>{if(e.key==='ArrowDown'){selected=(selected+1)%items.length;render();e.preventDefault()}if(e.key==='ArrowUp'){selected=(selected+items.length-1)%items.length;render();e.preventDefault()}if(e.key==='F2'){cleanup();openUEFI(false);e.preventDefault()}if(e.key==='Enter'){cleanup();if(selected===2)openUEFI(false);else if(selected===3){bootLog('Memory diagnostic: browser-managed memory only.');setTimeout(()=>showGrub(),300)}else{bootOverride=selected===1?'RecoveryBoot':'JShellMain';continueBoot()}e.preventDefault()}};const cleanup=()=>{document.removeEventListener('keydown',key);grub.classList.add('hidden')};document.addEventListener('keydown',key)}
 function openUEFI(fromOS=false){show('uefi');const u=new UEFI(state,{onExit:()=>fromOS?startOS():continueBoot()});u.open()}
 
 function appendSetupLine(root,text=''){const d=document.createElement('div');d.textContent=text;root.appendChild(d)}
