@@ -34,7 +34,7 @@ button:hover{background:rgba(128,128,128,.28)}
 .win{position:absolute;display:flex;flex-direction:column;background:var(--p);border:1px solid var(--ac);box-shadow:0 8px 30px #0008;resize:both;overflow:hidden;min-width:260px;min-height:160px}
 .win.max{inset:0!important;width:auto!important;height:auto!important;resize:none}
 .tb{display:flex;align-items:center;gap:6px;height:32px;padding-left:8px;background:var(--p2);touch-action:none}
-.tb b{font-weight:400;white-space:nowrap}.tb button{height:32px;padding:0 12px}.tb .x:hover{background:#e81123;color:#fff}
+.tb b{font-weight:400;white-space:nowrap;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.tb button{height:32px;width:42px;padding:0;flex:none;justify-content:center;overflow:hidden;touch-action:manipulation}.tb .x:hover{background:#e81123;color:#fff}
 .bd{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
 .term{flex:1;overflow:auto;background:#0c0c0c;color:#ccc;font:14px Consolas,monospace;padding:6px;user-select:text}
 .term .out{white-space:pre-wrap;word-break:break-all}.in{display:flex}.in input{flex:1;background:none;border:0;color:inherit;font:inherit;padding:0}
@@ -46,12 +46,12 @@ button:hover{background:rgba(128,128,128,.28)}
 .pg h3{margin:14px 0 6px}.sw{display:inline-block;width:34px;height:34px;margin:4px;cursor:pointer;border:2px solid transparent}.sw:hover{border-color:var(--fg)}
 details{padding-left:12px}summary{cursor:default;list-style:none;padding:2px 4px;white-space:nowrap}
 #uefi{background:#00a;font-family:Consolas,monospace;align-items:stretch;text-align:left}
-.ub{margin:auto;width:min(720px,96vw);border:2px solid #aaa;background:#008}.ut{display:flex;background:#aaa}
-.ut button{color:#000;padding:8px 16px}.ut .on{background:#00a;color:#fff}.uc{padding:16px;min-height:220px}
-.ur{display:flex;justify-content:space-between;width:100%;padding:6px 8px;gap:20px}button.ur:hover{background:#fff;color:#000}
+.ub{margin:auto;width:min(1100px,96vw);height:min(780px,92vh);display:flex;flex-direction:column;font-size:17px;border:2px solid #aaa;background:#008}.ut{display:flex;background:#aaa}
+.ut button{color:#000;padding:12px 22px}.ut .on{background:#00a;color:#fff}.uc{padding:20px;flex:1;overflow:auto}
+.ur{display:flex;justify-content:space-between;width:100%;padding:10px 12px;gap:20px}button.ur:hover{background:#fff;color:#000}
 .ub .hint{padding:8px 12px;margin:0;border-top:1px solid #aaa;cursor:default}
 </style></head><body>
-<div id=boot class=scr><div><span class=material-icons style="font-size:64px">window</span><div>JShell GUI</div><span class="material-icons spin">autorenew</span><div id=bh class=hint>F2 / Delete: UEFI（タップでも可）</div></div></div>
+<div id=boot class=scr><div><span class=material-icons style="font-size:64px">window</span><div>JShell GUI</div><span class="material-icons spin">autorenew</span></div></div>
 <div id=login class="scr hide"></div>
 <div id=desk class=hide><div id=ic></div></div>
 <div id=tbar class=hide></div><div id=start class=hide></div><div id=ctx class=hide></div>
@@ -80,9 +80,9 @@ function openApp(name,arg){const A=APPS[name];if(!A)return;
  if(A.single)for(const w of wins.values())if(w.app==name){show(w);return w}
  const id=++wid,el=document.createElement('div'),W=A.size||[640,420],o=(id%8)*26;el.className='win';
  el.style.cssText=`left:${Math.max(0,Math.min(40+o,innerWidth-W[0]))}px;top:${24+o}px;width:${Math.min(W[0],innerWidth)}px;height:${Math.min(W[1],innerHeight-44)}px`;
- el.innerHTML=`<div class=tb>${ico(A.icon)}<b></b><i class=sp></i><button data-a=min>${ico('remove')}</button><button data-a=max>${ico('crop_square')}</button><button data-a=close class=x>${ico('close')}</button></div><div class=bd></div>`;
+ el.innerHTML=`<div class=tb>${ico(A.icon)}<b></b><button data-a=min>${ico('remove')}</button><button data-a=max>${ico('crop_square')}</button><button data-a=close class=x>${ico('close')}</button></div><div class=bd></div>`;
  const w={id,app:name,el,body:el.lastChild,A,min:false},tb=el.firstChild;w.title=t=>{el.querySelector('b').textContent=t};w.title(A.title);
- wins.set(id,w);$('#desk').appendChild(el);
+ wins.set(id,w);if(innerWidth<700)el.classList.add('max');$('#desk').appendChild(el);
  el.addEventListener('pointerdown',()=>show(w),true);
  tb.addEventListener('pointerdown',e=>{if(e.target.closest('button')||el.classList.contains('max'))return;const r=el.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;tb.setPointerCapture(e.pointerId);
   const mv=ev=>{el.style.left=Math.max(60-r.width,Math.min(innerWidth-60,ev.clientX-dx))+'px';el.style.top=Math.max(0,Math.min(innerHeight-80,ev.clientY-dy))+'px'},
@@ -105,7 +105,7 @@ function startMenu(f){const s=$('#start'),open=f??s.classList.contains('hide');s
 $('#start').onclick=e=>{const b=e.target.closest('button');if(!b)return;startMenu(false);if(b.dataset.o)openApp(b.dataset.o);if(b.dataset.p)power(b.dataset.p)};
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('#start,#sb'))startMenu(false);if(!e.target.closest('#ctx'))$('#ctx').classList.add('hide')});
 $('#desk').oncontextmenu=e=>{e.preventDefault();if(e.target.closest('.win'))return;const c=$('#ctx');
- c.innerHTML=`<button data-o=settings>${ico('palette')}個人用設定</button><button data-o=cmd>${ico('terminal')}コマンド プロンプト</button>`;
+ c.innerHTML=`<button data-o=settings>${ico('palette')}個人用設定</button><button data-o=cmd>${ico('terminal')}シェル</button>`;
  c.style.left=Math.min(e.clientX,innerWidth-205)+'px';c.style.top=Math.min(e.clientY,innerHeight-110)+'px';c.classList.remove('hide')};
 $('#ctx').onclick=e=>{const b=e.target.closest('button');if(b){openApp(b.dataset.o);$('#ctx').classList.add('hide')}};
 function clock(){const d=new Date(),t=d.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),c=$('#clk'),l=$('#lt');if(c)c.innerHTML=t+'<br>'+d.toLocaleDateString('ja-JP');if(l)l.textContent=t}
@@ -113,8 +113,9 @@ setInterval(clock,1000);
 /* ---- boot / login / power ---- */
 const hideAll=()=>{for(const i of['boot','login','uefi','desk','tbar','start','ctx'])$('#'+i).classList.add('hide');const o=$('#off');o&&o.remove()};
 function boot(){apply();hideAll();$('#boot').classList.remove('hide');const b=BOOT(),bd=parseInt(b.BootDelay),d=b.FastBoot=='Enabled'?300:(isNaN(bd)?1200:bd);let done=0,t;
- const go=f=>{if(done)return;done=1;clearTimeout(t);removeEventListener('keydown',kd);f()},kd=e=>{if(['F2','Delete','Escape'].includes(e.key)){e.preventDefault();go(uefi)}};
- addEventListener('keydown',kd);$('#bh').onclick=()=>go(uefi);t=setTimeout(()=>go(S.user?loginScr:setupScr),d)}
+ let n=0;const go=f=>{if(done)return;done=1;clearTimeout(t);removeEventListener('keydown',kd);removeEventListener('pointerdown',pd);f()},
+ kd=e=>{if(['F2','Delete','Escape'].includes(e.key)||(e.key=='Enter'&&++n>=3)){e.preventDefault();go(uefi)}},pd=()=>{if(++n>=3)go(uefi)};
+ addEventListener('keydown',kd);addEventListener('pointerdown',pd);t=setTimeout(()=>go(S.user?loginScr:setupScr),d)}
 const wall=()=>`linear-gradient(135deg,${RK().Wallpaper||'#0b3d91'},#000 170%)`;
 function loginScr(){hideAll();const L=$('#login');L.style.background=wall();L.classList.remove('hide');
  L.innerHTML=`<div class=lg><div class=big id=lt></div><div class=av>${ico('account_circle')}</div><h2>${esc(S.user)}</h2>${S.pass?'<input id=lp type=password placeholder=パスワード>':''}<div id=le class=err></div><button id=lb class=pri>${ico('arrow_forward')}サインイン</button></div><div class=pw><button onclick="power('re')">${ico('restart_alt')}</button><button onclick="power('off')">${ico('power_settings_new')}</button></div>`;clock();
@@ -141,27 +142,29 @@ function uefi(){hideAll();closeAll();const U=$('#uefi');U.classList.remove('hide
  addEventListener('keydown',kd);
  U.onclick=e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;if(d.t)tab=+d.t;else if(d.a=='d')v.d=DL[(DL.indexOf(v.d)+1)%DL.length];else if(d.a=='f')v.f=!v.f;else if(d.a=='s')v.s=!v.s;else if(d.a=='save')return exit(1);else if(d.a=='quit')return exit(0);render()};render()}
 /* ---- apps ---- */
-APPS.cmd={title:'コマンド プロンプト',icon:'terminal',size:[700,420],init(w){
+APPS.cmd={title:'シェル',icon:'terminal',size:[700,420],init(w){
  w.body.innerHTML='<div class=term><div class=out></div><div class=in><span class=ps></span><input spellcheck=false autocapitalize=none autocomplete=off></div></div>';
- const T=w.body.firstChild,out=T.querySelector('.out'),inp=T.querySelector('input'),ps=T.querySelector('.ps');let cwd=home(),hist=[],hi=0;
- const pr=(t='')=>{const d=document.createElement('div');d.textContent=t||' ';out.appendChild(d)},pmt=()=>ps.textContent=disp(cwd)+'>';
- pr('JShell GUI [Version 2.0.0]');pr('help でコマンド一覧を表示します。');pr();pmt();
+ const T=w.body.firstChild,out=T.querySelector('.out'),inp=T.querySelector('input'),ps=T.querySelector('.ps'),coarse=matchMedia('(pointer:coarse)').matches;let cwd=home(),hist=[],hi=0;
+ const pr=(t='')=>{const d=document.createElement('div');d.textContent=t||' ';out.appendChild(d)},loc=p=>p==home()?'~':p.startsWith(home()+'/')?'~'+p.slice(home().length):'/'+p,pmt=()=>ps.textContent=`${S.user}@jshell:${loc(cwd)}> `,
+ N=p=>norm(p.replace(/^~/,'/'+home()),cwd),fl=a=>a.filter(x=>!x.startsWith('-'));
+ pr('JShell GUI 2.0.0');pr('help でコマンド一覧を表示します。');pr();pmt();
  const C={
-  help(){pr('help ver cls echo dir cd type md del whoami date tasklist taskkill reg start exit');pr('start: explorer cmd notepad settings regedit bin')},
-  ver(){pr('JShell GUI [Version 2.0.0]')},cls(){out.innerHTML=''},echo(a){pr(a.join(' '))},whoami(){pr(S.user)},date(){pr(new Date().toLocaleString())},
-  dir(a){const p=a[0]?norm(a[0],cwd):cwd,n=get(p);if(!n)return pr('指定されたパスが見つかりません。');if(n.t!='d')return pr(nm(p));pr(' '+disp(p)+' のディレクトリ');for(const[k,v]of Object.entries(n.c).sort())pr((v.t=='d'?'<DIR>   ':'        ')+k)},
-  cd(a){if(!a[0])return pr(disp(cwd));const p=norm(a.join(' '),cwd),n=get(p);if(!n||n.t!='d')return pr('指定されたパスが見つかりません。');cwd=p},
-  type(a){const n=get(norm(a[0]||'',cwd));if(!n||n.t!='f')return pr('ファイルが見つかりません。');n.d.split('\n').forEach(pr)},
-  md(a){if(a[0]&&!put(norm(a[0],cwd),dir()))pr('作成できません。')},
-  del(a){if(!trashIt(norm(a[0]||'',cwd)))pr('ファイルが見つかりません。')},
-  tasklist(){pr('ID   名前');for(const x of wins.values())pr(String(x.id).padEnd(5)+x.A.title)},
-  taskkill(a){const x=wins.get(+a[0]);x?closeW(x):pr('プロセスが見つかりません。')},
+  help(){pr('help ver clear echo ls cd pwd cat mkdir touch rm whoami date ps kill reg start exit');pr('start: explorer shell notepad settings regedit bin')},
+  ver(){pr('JShell GUI 2.0.0')},clear(){out.innerHTML=''},echo(a){pr(a.join(' '))},whoami(){pr(S.user)},date(){pr(new Date().toString())},pwd(){pr('/'+cwd)},
+  ls(a){a=fl(a);const p=a[0]?N(a[0]):cwd,n=get(p);if(!n)return pr(`ls: ${a[0]}: no such file or directory`);if(n.t!='d')return pr(nm(p));for(const[k,v]of Object.entries(n.c).sort())pr(k+(v.t=='d'?'/':''))},
+  cd(a){const p=a[0]?N(a.join(' ')):home(),n=get(p);if(!n||n.t!='d')return pr(`cd: ${a[0]}: no such directory`);cwd=p},
+  cat(a){for(const x of fl(a)){const n=get(N(x));if(!n||n.t!='f')pr(`cat: ${x}: no such file`);else n.d.split('\n').forEach(pr)}},
+  mkdir(a){for(const x of fl(a))if(!put(N(x),dir()))pr(`mkdir: ${x}: cannot create directory`)},
+  touch(a){for(const x of fl(a))if(!get(N(x))&&!put(N(x),file('')))pr(`touch: ${x}: cannot create file`)},
+  rm(a){for(const x of fl(a))if(!trashIt(N(x)))pr(`rm: ${x}: no such file or directory`)},
+  ps(){pr('ID   NAME');for(const x of wins.values())pr(String(x.id).padEnd(5)+x.A.title)},
+  kill(a){const x=wins.get(+fl(a)[0]);x?closeW(x):pr('kill: no such process')},
   reg(){const walk=(o,p)=>{for(const[k,v]of Object.entries(o))typeof v=='object'?walk(v,p+'\\'+k):pr(p+'  '+k+' = '+v)};walk(S.reg,'')},
-  start(a){APPS[a[0]]?openApp(a[0]):pr('使い方: start explorer|cmd|notepad|settings|regedit|bin')},
+  start(a){const k=a[0]=='shell'?'cmd':a[0];APPS[k]?openApp(k):pr('usage: start explorer|shell|notepad|settings|regedit|bin')},
   exit(){closeW(w)}};
- C.ls=C.dir;C.cat=C.type;C.mkdir=C.md;C.rm=C.del;C.clear=C.cls;
- inp.onkeydown=e=>{if(e.isComposing)return;
-  if(e.key=='Enter'){const l=inp.value.trim();inp.value='';pr(ps.textContent+l);if(l){hist.push(l);hi=hist.length;const[c,...a]=l.split(/\s+/),f=C[c.toLowerCase()];f?f(a):pr(`'${c}' は、内部コマンドまたは外部コマンド、操作可能なプログラムまたはバッチ ファイルとして認識されていません。`)}pmt();T.scrollTop=T.scrollHeight}
+ C.version=C.ver;
+ inp.onkeydown=e=>{if(!coarse&&(e.key=='Process'||e.isComposing))return;
+  if(e.key=='Enter'){const l=inp.value.trim();inp.value='';pr(ps.textContent+l);if(l){hist.push(l);hi=hist.length;const[c,...a]=l.split(/\s+/),f=C[c.toLowerCase()];f?f(a):pr(`jshell: ${c}: command not found`)}pmt();T.scrollTop=T.scrollHeight}
   else if(e.key=='ArrowUp'){hi=Math.max(0,hi-1);inp.value=hist[hi]||'';e.preventDefault()}
   else if(e.key=='ArrowDown'){hi=Math.min(hist.length,hi+1);inp.value=hist[hi]||''}};
  T.onclick=()=>inp.focus();setTimeout(()=>inp.focus(),0)}};
