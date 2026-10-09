@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JShell GUI ヘルプ</title>
+<style>
+:root{--bg:#fff;--fg:#1c1c1e;--mut:#6b6b70;--ac:#0078d4;--card:#f4f6f9;--bd:#dde1e6;--code:#eaeef3;--warn:#fff4ce}
+@media(prefers-color-scheme:dark){:root{--bg:#16181b;--fg:#ececee;--mut:#a0a0a8;--card:#202327;--bd:#32363c;--code:#292d32;--warn:#3d3512}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.9 -apple-system,"Hiragino Sans","Yu Gothic UI",system-ui,sans-serif}
+header{background:linear-gradient(135deg,#0b3d91,#0078d4);color:#fff;padding:30px 20px}
+header h1{margin:0;font-size:27px}header p{margin:8px 0 0;opacity:.92}header a{color:#fff}
+.wrap{max-width:1060px;margin:0 auto;display:flex;gap:30px;padding:0 16px}
+nav{position:sticky;top:0;align-self:flex-start;width:220px;flex:none;padding:18px 0;max-height:100vh;overflow:auto;font-size:14px}
+nav a{display:block;padding:5px 10px;color:var(--fg);text-decoration:none;border-left:3px solid transparent}
+nav a:hover{border-color:var(--ac);background:var(--card)}
+nav input{width:100%;padding:8px 10px;margin-bottom:10px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--fg);font:inherit;font-size:14px}
+main{flex:1;min-width:0;padding:6px 0 70px}
+section{padding-top:10px;margin-top:30px;border-top:1px solid var(--bd)}
+h2{font-size:23px;margin:0 0 10px}h3{font-size:18px;margin:26px 0 6px}
+p,li{margin:.5em 0}ul,ol{padding-left:1.4em}
+code,kbd{background:var(--code);padding:1px 6px;border-radius:5px;font:14px Consolas,Menlo,monospace}
+kbd{border:1px solid var(--bd);border-bottom-width:2px}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow:auto;font:14px/1.6 Consolas,Menlo,monospace}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--bd);padding:7px 10px;text-align:left;vertical-align:top}th{background:var(--card)}
+.note,.warn{padding:10px 14px;border-radius:8px;margin:14px 0;background:var(--card);border-left:4px solid var(--ac)}
+.warn{background:var(--warn);border-left-color:#e6a700}
+details{border:1px solid var(--bd);border-radius:8px;margin:10px 0;padding:2px 14px;background:var(--card)}
+summary{cursor:pointer;font-weight:600;padding:8px 0}
+.btn{display:inline-block;background:var(--ac);color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;margin:6px 8px 6px 0}
+footer{text-align:center;color:var(--mut);padding:30px 16px;border-top:1px solid var(--bd);font-size:14px}
+@media(max-width:820px){.wrap{display:block}nav{position:static;width:auto;max-height:none}nav a{display:inline-block}}
+</style></head><body>
+<header><h1>JShell GUI ヘルプ</h1>
+<p>ブラウザの中で動く Windows 風 OS「JShell GUI」の使い方をまとめたページです。はじめての方も、ひとつずつ読めば使えるようになります。</p>
+<p><a href="../gui.html">▶ JShell GUI を開く</a>　／　<a href="../index.html">文字だけの JShell (CUI) を開く</a></p></header>
+
+<div class="wrap">
+<nav><input id="q" type="search" placeholder="ヘルプ内を検索">
+<a href="#start">1. はじめに</a><a href="#desktop">2. 画面の見かた</a><a href="#windows">3. ウィンドウの操作</a>
+<a href="#shell">4. シェル</a><a href="#explorer">5. エクスプローラー</a><a href="#notepad">6. メモ帳</a>
+<a href="#settings">7. 設定</a><a href="#regedit">8. レジストリ エディター</a><a href="#bin">9. ごみ箱</a>
+<a href="#uefi">10. UEFI (BIOS)</a><a href="#bsod">11. ブルースクリーン</a><a href="#recovery">12. 回復環境</a>
+<a href="#data">13. データとセキュリティ</a><a href="#keys">14. 操作一覧</a><a href="#faq">15. よくある質問</a><a href="#limits">16. できないこと</a></nav>
+
+<main>
+<section id="start"><h2>1. はじめに</h2>
+<p>JShell GUI は、HTML・CSS・JavaScript だけで作られた「ブラウザの中の OS」です。インストールは不要で、PC・iPad・iPhone・Android の新しめのブラウザで動きます。</p>
+<a class="btn" href="../gui.html">JShell GUI を開く</a>
+<div class="note"><b>インターネット接続について：</b>アイコンは Google の Material Icons を使うため、読み込めないとアイコンが英単語で表示されます（ウィンドウ右上の３つのボタンだけは <code>– □ ×</code> に自動で切り替わります）。</div>
+<h3>はじめて起動したとき</h3>
+<ol>
+<li>ページを開くと、約 1 秒の起動画面が表示されます。</li>
+<li>「アカウントの作成」画面が出ます。<b>ユーザー名</b>（英数字と <code>.</code> <code>_</code> <code>-</code> のみ・24 文字まで）を入力します。</li>
+<li><b>パスワード</b>は任意です。空欄のままにするとパスワードなしで使えます（あとから設定アプリで変更できます）。</li>
+<li>「作成」を押すとデスクトップが表示されます。ユーザー名のホームフォルダー（<code>Users/あなたの名前</code>）と、Desktop・Documents・Downloads フォルダーが自動で作られます。</li>
+</ol>
+<h3>２回目以降</h3>
+<p>起動後にログイン画面が表示されるので、パスワードを入力して「サインイン」を押します（パスワードを設定していない場合は「サインイン」だけで入れます）。</p>
+<h3>文字だけの JShell から開く</h3>
+<p>文字だけの JShell (CUI) では、<code>start -g</code> と入力すると新しいタブでこの GUI が開きます。</p>
+</section>
+
+<section id="desktop"><h2>2. 画面の見かた</h2>
+<h3>デスクトップ</h3>
+<p>左上に<b>ごみ箱</b>のアイコンだけが置かれています。ダブルクリック（タップ）で開きます。何もない所を<b>右クリック</b>すると「個人用設定」と「シェル」のメニューが出ます。</p>
+<h3>タスクバー（画面の下）</h3>
+<table><tr><th>場所</th><th>はたらき</th></tr>
+<tr><td>左端の窓アイコン</td><td>スタートメニューを開閉します。</td></tr>
+<tr><td>フォルダー・ターミナル・歯車</td><td>エクスプローラー・シェル・設定をすぐに開けます。</td></tr>
+<tr><td>区切り線のあとのボタン</td><td>開いているウィンドウです。押すと前面に出ます。前面のウィンドウをもう一度押すと最小化、最小化中なら元に戻ります。</td></tr>
+<tr><td>右端</td><td>時刻と日付です。</td></tr></table>
+<h3>スタートメニュー</h3>
+<ul><li>アプリ：エクスプローラー／シェル／メモ帳／設定／レジストリ エディター／ごみ箱</li>
+<li>サインアウト：ログイン画面に戻ります。</li><li>再起動：起動画面からやり直します。</li>
+<li>UEFI ファームウェア設定：BIOS 画面に入ります（10 章）。</li><li>回復環境：回復環境に入ります（12 章）。</li>
+<li>シャットダウン：画面が消えます。クリック（タップ）すると電源が入ります。</li></ul>
+</section>
+
+<section id="windows"><h2>3. ウィンドウの操作</h2>
+<table><tr><th>やりたいこと</th><th>方法</th></tr>
+<tr><td>動かす</td><td>タイトルバー（上の帯）をドラッグします。</td></tr>
+<tr><td>大きさを変える</td><td>ウィンドウ右下の角をドラッグします（最大化中は不可）。</td></tr>
+<tr><td>最大化／元に戻す</td><td>タイトルバー右の <code>□</code> を押す、またはタイトルバーをダブルクリックします。</td></tr>
+<tr><td>最小化</td><td>タイトルバー右の <code>–</code> を押します。タスクバーのボタンで戻せます。</td></tr>
+<tr><td>閉じる</td><td>タイトルバー右端の <code>×</code> を押します。</td></tr></table>
+<p>画面の幅が 700px より小さい端末（スマートフォンなど）では、ウィンドウは最初から<b>最大化</b>で開きます。ウィンドウが開く・閉じる・最小化するときには軽いアニメーションが入ります（端末の「視差効果を減らす」がオンなら表示されません）。</p>
+</section>
+
+<section id="shell"><h2>4. シェル（文字で操作するアプリ）</h2>
+<p>コマンドを打って操作するアプリです。画面の下の <code>名前@jshell:~&gt;</code> のあとにコマンドを入力して Enter を押します。<kbd>↑</kbd> <kbd>↓</kbd> で入力した履歴をたどれます。大文字・小文字は区別されません。</p>
+<table><tr><th>コマンド</th><th>説明と例</th></tr>
+<tr><td><code>help</code></td><td>コマンドの一覧を表示します。</td></tr>
+<tr><td><code>ver</code> / <code>version</code></td><td>バージョンを表示します。</td></tr>
+<tr><td><code>clear</code></td><td>画面をきれいにします。</td></tr>
+<tr><td><code>echo 文字</code></td><td>文字をそのまま表示します。<br><code>echo こんにちは</code></td></tr>
+<tr><td><code>ls [場所]</code></td><td>フォルダーの中身を表示します（フォルダーは末尾に <code>/</code>）。<br><code>ls</code>　<code>ls Documents</code></td></tr>
+<tr><td><code>cd [場所]</code></td><td>フォルダーを移動します。何も付けないとホームに戻ります。<code>~</code> はホームを表します。<br><code>cd Documents</code>　<code>cd ..</code>　<code>cd ~</code></td></tr>
+<tr><td><code>pwd</code></td><td>今いる場所を表示します。</td></tr>
+<tr><td><code>cat ファイル</code></td><td>テキストファイルの中身を表示します。</td></tr>
+<tr><td><code>mkdir 名前</code></td><td>フォルダーを作ります。</td></tr>
+<tr><td><code>touch 名前</code></td><td>空のファイルを作ります。</td></tr>
+<tr><td><code>rm 名前</code></td><td>ファイルやフォルダーを<b>ごみ箱へ移動</b>します（すぐには消えません）。</td></tr>
+<tr><td><code>whoami</code> / <code>date</code></td><td>ユーザー名／現在の日時を表示します。</td></tr>
+<tr><td><code>ps</code></td><td>開いているウィンドウを番号付きで表示します。</td></tr>
+<tr><td><code>kill 番号</code></td><td><code>ps</code> で調べた番号のウィンドウを閉じます。</td></tr>
+<tr><td><code>reg</code></td><td>レジストリの内容を一覧表示します。</td></tr>
+<tr><td><code>start アプリ名</code></td><td>アプリを開きます。<code>explorer</code> <code>shell</code> <code>notepad</code> <code>settings</code> <code>regedit</code> <code>bin</code><br><code>start notepad</code></td></tr>
+<tr><td><code>recovery</code></td><td>回復環境を開きます（12 章）。</td></tr>
+<tr><td><code>crash</code></td><td><b>わざとブルースクリーンを起こします</b>（11 章）。テスト用です。</td></tr>
+<tr><td><code>exit</code></td><td>このシェルのウィンドウを閉じます。</td></tr></table>
+<div class="note">このシェルでは、パイプ（<code>|</code>）・リダイレクト（<code>&gt;</code>）・ワイルドカード（<code>*</code>）はまだ使えません。名前にスペースを含むファイルは扱えない場合があります。</div>
+</section>
+
+<section id="explorer"><h2>5. エクスプローラー（ファイル管理）</h2>
+<p>左側に、フォルダー全体が<b>ツリー</b>で表示されます。<code>├──</code> や <code>└──</code> の線でどのフォルダーの中にあるかが分かります。右側には、いま選んでいるフォルダーの中身が並びます。</p>
+<pre>C:/
+├── Users
+│   └── maito
+│       ├── Desktop
+│       ├── Documents
+│       └── Downloads
+└── Windows</pre>
+<h3>基本の操作</h3>
+<ul>
+<li><b>フォルダーを開く：</b>左のツリーのフォルダーをクリック（開閉もできます）。右の一覧ではダブルクリック（ダブルタップ）します。</li>
+<li><b>ファイルを開く：</b>ツリーでクリック、または右の一覧でダブルクリックすると<a href="#notepad">メモ帳</a>で開きます。</li>
+<li><b>ひとつ上へ：</b>上部の矢印（↑）ボタンです。上のアドレス欄は現在の場所の表示用で、入力はできません。</li>
+<li><b>新しいフォルダー／ファイル：</b>上部のフォルダー＋ボタン／ファイル＋ボタンを押し、名前を入力します（<code>/</code> と <code>\</code> は使えません）。</li>
+<li><b>削除：</b>右の一覧で項目をクリックして選び、ごみ箱ボタンを押します。<a href="#bin">ごみ箱</a>に移動するだけなので、あとで戻せます。</li>
+</ul>
+<p>ツリーの一番下の「ごみ箱」をクリックすると、ごみ箱の中身が表示されます。</p>
+</section>
+
+<section id="notepad"><h2>6. メモ帳</h2>
+<p>テキストファイルを編集するアプリです。エクスプローラーでファイルを開くと起動します。スタートメニューから開くと、新規の白紙になります。</p>
+<ul><li><b>保存：</b>上部の「保存」ボタンを押します。</li>
+<li>新規の場合は、ファイル名を聞かれます。入力すると <code>Documents</code> フォルダーに保存されます。</li>
+<li>保存しないで閉じると、編集した内容は失われます。</li></ul>
+</section>
+
+<section id="settings"><h2>7. 設定</h2>
+<p>左のメニューから項目を選びます。設定アプリは同時に１つだけ開けます。</p>
+<table><tr><th>項目</th><th>できること</th></tr>
+<tr><td>個人用設定</td><td>テーマ（ダーク／ライト）、アクセントカラー（６色）、壁紙の色（６色）を変えられます。選ぶとすぐ反映されます。</td></tr>
+<tr><td>アカウント</td><td>パスワードの変更・削除ができます。新しいパスワードを入れて「変更」を押します。</td></tr>
+<tr><td>システム情報</td><td>ブラウザの情報、画面の大きさ、CPU の数、保存されているデータの大きさを確認できます。<b>「初期化」</b>を押すと、すべてのデータを削除して最初の状態に戻します（確認あり・元に戻せません）。</td></tr>
+<tr><td>ブートとUEFI</td><td>「UEFI ファームウェア設定へ再起動」と「回復環境へ再起動」ができます。</td></tr></table>
+<p>設定した内容は<a href="#regedit">レジストリ</a>に保存されます（テーマ・アクセント・壁紙は <code>HKEY_CURRENT_USER\Software\JShell</code>）。</p>
+</section>
+
+<section id="regedit"><h2>8. レジストリ エディター</h2>
+<p>OS の設定値を直接見たり書き換えたりするアプリです。左がキー（フォルダーのようなもの）のツリー、右がそのキーに入っている<b>値</b>の一覧です。</p>
+<ul><li><b>値を編集：</b>右の一覧で値をクリックすると入力欄が出ます。</li>
+<li><b>値を追加：</b>上部の「値」ボタン。<b>キーを追加：</b>「キー」ボタン（名前に <code>/</code> と <code>\</code> は使えません）。</li>
+<li><b>キーを削除：</b>「キー削除」ボタン（一番上の HKEY_ で始まるキーは削除できません）。</li></ul>
+<div class="warn"><b>⚠ 正しくない値を保存すると、ブルースクリーンになります。</b> 次の値には決まりがあり、守られていないと即座にブルースクリーン（<a href="#bsod">11 章</a>）が表示されます。大文字・小文字も区別され、<code>Dark</code> は誤りです。値を削除した場合も同じです。</div>
+<table><tr><th>場所（キー）</th><th>値の名前</th><th>正しい値</th><th>初期値</th></tr>
+<tr><td>HKEY_CURRENT_USER\Software\JShell</td><td>Theme</td><td><code>dark</code> か <code>light</code></td><td>dark</td></tr>
+<tr><td>同上</td><td>Accent</td><td>色コード（<code>#0078d4</code> のような #＋3 桁または 6 桁の 16 進数）</td><td>#0078d4</td></tr>
+<tr><td>同上</td><td>Wallpaper</td><td>色コード</td><td>#0b3d91</td></tr>
+<tr><td>HKEY_LOCAL_MACHINE\SYSTEM\Boot</td><td>BootDelay</td><td>0〜60000 の数字（ミリ秒）</td><td>1200</td></tr>
+<tr><td>同上</td><td>SecureBoot</td><td><code>Enabled</code> か <code>Disabled</code></td><td>Enabled</td></tr>
+<tr><td>同上</td><td>FastBoot</td><td><code>Enabled</code> か <code>Disabled</code></td><td>Disabled</td></tr></table>
+<p>これ以外のキーや値は自由に追加・編集できます。誤った値は右の一覧で赤く表示されます。</p>
+</section>
+
+<section id="bin"><h2>9. ごみ箱</h2>
+<p>エクスプローラーやシェルで削除したものがここに入ります。デスクトップのアイコンか、スタートメニュー、エクスプローラーのツリーから開けます。</p>
+<ul><li><b>元に戻す：</b>項目を選んで「復元」ボタン。元の場所に戻ります（元のフォルダーが無いときはホームに戻ります）。</li>
+<li><b>完全に削除：</b>項目を選んで削除ボタン（元に戻せません）。</li>
+<li><b>空にする：</b>「ごみ箱を空にする」ボタンで全部を完全に削除します。</li></ul>
+</section>
+
+<section id="uefi"><h2>10. UEFI（BIOS）</h2>
+<p>OS が起動する前の設定画面です。青い画面に灰色の枠で表示されます。</p>
+<h3>入りかた</h3>
+<ul><li>起動画面が出ている間（初期設定では約 1.2 秒）に、<kbd>Enter</kbd> を 3 回続けて押します。</li>
+<li>または <kbd>F2</kbd>、<kbd>Delete</kbd>、<kbd>Esc</kbd> のどれかを押します。</li>
+<li>キーボードのない端末では、<b>起動画面を 3 回続けてタップ</b>します。</li>
+<li>スタートメニュー「UEFI ファームウェア設定」、設定アプリ、回復環境からも入れます。</li></ul>
+<div class="note">間に合わないときは、いったん UEFI に入って Boot Delay（待ち時間）を長くしてください。</div>
+<h3>画面の項目</h3>
+<table><tr><th>タブ</th><th>内容</th></tr>
+<tr><td>Main</td><td>ファームウェア、CPU の数、メモリの目安、画面サイズ、ユーザー名を表示します（見るだけ）。</td></tr>
+<tr><td>Boot</td><td><b>Boot Delay</b>（0 / 300 / 600 / 1200 / 3000 / 5000 ms から順に切り替え）と、<b>Fast Boot</b>（有効だと待ち時間が約 0.3 秒に短縮）。</td></tr>
+<tr><td>Security</td><td>Secure Boot の切り替え。仮想の項目で、動作には影響しません。</td></tr>
+<tr><td>Exit</td><td>保存して終了／破棄して終了。</td></tr></table>
+<h3>キー操作</h3>
+<table><tr><th>キー</th><th>動作</th></tr>
+<tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>タブを切り替える</td></tr><tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>項目を選ぶ</td></tr>
+<tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>値を変える</td></tr><tr><td><kbd>F10</kbd></td><td>保存して終了</td></tr><tr><td><kbd>Esc</kbd></td><td>変更を破棄して終了</td></tr></table>
+<p>マウスやタップでも操作できます。終了すると OS が再起動します。設定は <code>HKEY_LOCAL_MACHINE\SYSTEM\Boot</code> に保存されます。UEFI を開いた直後の約 0.6 秒間は、Enter の連打で値が変わらないように Enter を無視します。</p>
+</section>
+
+<section id="bsod"><h2>11. ブルースクリーン</h2>
+<p>重大なエラーが起きると、青い画面に <code>:(</code> と進行状況が表示されます。数字が 0% から 100% まで進み、100% になると「再起動します...」と表示されて<b>自動で再起動</b>します。操作は必要ありません。</p>
+<h3>表示される原因（停止コード）</h3>
+<table><tr><th>停止コード</th><th>原因</th></tr>
+<tr><td>CRITICAL_REGISTRY_VALUE</td><td>レジストリに正しくない値を保存した、または必要な値を削除した（8 章）。</td></tr>
+<tr><td>MANUALLY_INITIATED_CRASH</td><td>シェルの <code>crash</code> コマンドを実行した。</td></tr>
+<tr><td>SYSTEM_THREAD_EXCEPTION_NOT_HANDLED</td><td>プログラムの途中でエラー（例外）が発生した。</td></tr>
+<tr><td>KERNEL_SECURITY_CHECK_FAILURE</td><td>処理の失敗が処理されないまま残った。</td></tr></table>
+<p>「失敗した内容」には、どの値やファイルが原因かが表示されます。再起動後、ふつうは通常どおり起動します。ただし、<b>不正なレジストリ値が残ったまま</b>、または<b>ブルースクリーンが 2 回続いた</b>場合は、自動的に<a href="#recovery">回復環境</a>が開きます。</p>
+</section>
+
+<section id="recovery"><h2>12. 回復環境</h2>
+<p>OS が正常に起動しないときに使う、Windows の回復環境（WinRE）に似た修復用の画面です。</p>
+<h3>開きかた</h3>
+<ul><li><b>自動：</b>不正なレジストリ値があるまま起動したとき、またはブルースクリーンが 2 回続いたとき。「自動修復を準備しています」→「PC を診断中...」のあと、「PC が正常に起動しませんでした」と表示されます。ここで<b>詳細オプション</b>を選びます。</li>
+<li><b>手動：</b>スタートメニューの「回復環境」、設定アプリの「回復環境へ再起動」、シェルの <code>recovery</code>。</li></ul>
+<p>操作は <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>（選ぶ）、<kbd>Enter</kbd>（決定）、<kbd>Esc</kbd>（戻る）、またはマウス・タップです。</p>
+<h3>メニューの構成と中身</h3>
+<table><tr><th>メニュー</th><th>内容</th></tr>
+<tr><td>続行</td><td>終了して OS を起動し直します。問題が直っていなければ、また自動修復になります。</td></tr>
+<tr><td>デバイスの使用</td><td>（未対応）「利用できるデバイスが見つかりません」と表示されます。</td></tr>
+<tr><td>トラブルシューティング → このPCを初期状態に戻す</td><td><b>すべてのデータを削除</b>して最初の状態に戻します（確認あり）。</td></tr>
+<tr><td>詳細オプション → スタートアップ修復</td><td>正しくないレジストリ値を、初期値にまとめて戻します。<b>まずこれを試してください。</b></td></tr>
+<tr><td>詳細オプション → システムの復元</td><td>最後に正常に起動できたときのレジストリの状態に戻します。</td></tr>
+<tr><td>詳細オプション → UEFI ファームウェアの設定</td><td>UEFI 画面を開きます。</td></tr>
+<tr><td>詳細オプション → コマンド プロンプト</td><td>修復用の小さなコンソールです。<code>help</code> <code>reg</code>（不正な値の一覧）<code>repair</code> <code>restore</code> <code>exit</code> が使えます。</td></tr>
+<tr><td>スタートアップ設定／更新プログラムのアンインストール</td><td>（未対応）「利用できません」と表示されます。</td></tr>
+<tr><td>PC の電源を切る</td><td>シャットダウンします。</td></tr></table>
+<div class="note"><b>困ったときの順番：</b>① スタートアップ修復 → ② システムの復元 → ③ このPCを初期状態に戻す（最後の手段）。</div>
+</section>
+
+<section id="data"><h2>13. データの保存とセキュリティ</h2>
+<ul>
+<li>ファイル、設定、パスワードは、お使いの<b>ブラウザの中</b>（localStorage）に保存されます。サーバーには送信されません。</li>
+<li>保存されるのは、<b>そのブラウザ・その端末</b>だけです。別の端末や別のブラウザとは共有されません。プライベートブラウズでは、閉じると消えることがあります。</li>
+<li>ブラウザの「サイトデータの削除」や「履歴の消去」を行うと、データがすべて消えます。大切なものは別に控えてください。</li>
+<li>保存できる量はブラウザの上限（おおよそ 5MB）までです。</li>
+<li>文字だけの JShell (CUI) とは、データは別々です。</li></ul>
+<div class="warn"><b>パスワードについて：</b>このパスワードは「ふんいき」のための機能で、本物のセキュリティではありません。ブラウザの開発者ツールを使えば誰でも回避できます。<b>ふだん使っているパスワードは決して入力しないでください。</b></div>
+</section>
+
+<section id="keys"><h2>14. 操作一覧</h2>
+<table><tr><th>場面</th><th>操作</th></tr>
+<tr><td>起動中</td><td>Enter ×3 / F2 / Delete / Esc / 画面を 3 回タップ → UEFI</td></tr>
+<tr><td>UEFI</td><td>←→ タブ、↑↓ 項目、Enter 変更、F10 保存、Esc 破棄</td></tr>
+<tr><td>回復環境</td><td>矢印 選ぶ、Enter 決定、Esc 戻る</td></tr>
+<tr><td>シェル</td><td>Enter 実行、↑↓ 履歴</td></tr>
+<tr><td>ウィンドウ</td><td>タイトルバーのドラッグ 移動、ダブルクリック 最大化</td></tr>
+<tr><td>デスクトップ</td><td>右クリック メニュー、ダブルクリック ごみ箱を開く</td></tr></table>
+</section>
+
+<section id="faq"><h2>15. よくある質問</h2>
+<details><summary>アイコンが英語の文字になっている</summary><p>アイコン用のフォント（Google Material Icons）を読み込めていません。インターネットにつながっているか確認し、ページを再読み込みしてください。広告ブロッカーなどが原因のこともあります。</p></details>
+<details><summary>ウィンドウのボタン（– □ ×）が押せない</summary><p>ページを強制再読み込みしてください（PC は <kbd>Ctrl</kbd>+<kbd>F5</kbd>、スマートフォンはブラウザのキャッシュ削除）。古い版が残っていることがあります。それでも直らないときは、端末とブラウザの名前を添えてご連絡ください。</p></details>
+<details><summary>パスワードを忘れた</summary><p>残念ながらパスワードの再設定機能はありません。データを残す方法はありません。次のどちらかで初期化してください。<br>① ブラウザの設定でこのサイト（maitononaka.github.io）のサイトデータを削除する。<br>② ブラウザの開発者ツールのコンソールで <code>localStorage.removeItem('jshell-gui-v1')</code> を実行して再読み込みする。</p></details>
+<details><summary>ブルースクリーンが何度も出る／回復環境から抜けられない</summary><p>回復環境で「詳細オプション → スタートアップ修復」を実行し、「再起動」を押してください。それでも直らなければ「システムの復元」、最後に「このPCを初期状態に戻す」を使います。</p></details>
+<details><summary>UEFI に入れない</summary><p>起動画面が出ている間に Enter を素早く 3 回押します。間に合わないときは、スタートメニューの「UEFI ファームウェア設定」から入って Boot Delay を長くしてください。スマートフォンでは起動画面を素早く 3 回タップします。</p></details>
+<details><summary>ごみ箱を空にしたファイルを戻したい</summary><p>完全に削除したものは戻せません。</p></details>
+<details><summary>スマートフォンで画面の上の方が押しにくい</summary><p>ウィンドウは端末のステータスバーやノッチを避けて表示されます。ホーム画面に追加せずに通常のブラウザで開き、最新のバージョンで試してください。</p></details>
+<details><summary>バージョンを知りたい</summary><p>シェルで <code>ver</code> と入力するか、設定アプリの「システム情報」を開いてください。現在は 2.0.0 です。</p></details>
+</section>
+
+<section id="limits"><h2>16. まだできないこと・今後の予定</h2>
+<ul><li>Web ブラウザアプリ（iframe を使う予定です）</li><li>複数ユーザーの切り替え</li>
+<li>シェルのパイプ・リダイレクト・ワイルドカード、文字だけの JShell にある <code>pkg</code> や <code>vi</code> などの機能</li>
+<li>回復環境の「スタートアップ設定」「デバイスの使用」「更新プログラムのアンインストール」</li>
+<li>Secure Boot の実際の効果（今は表示だけです）</li></ul>
+<p>ご意見・不具合の報告は、<a href="https://github.com/maitononaka/JShell">GitHub のリポジトリ</a>へお願いします。</p>
+</section>
+</main></div>
+<footer>JShell GUI 2.0.0 ヘルプ ／ <a href="../gui.html">JShell GUI</a> ／ <a href="../index.html">JShell (CUI)</a> ／ <a href="#start">ページの先頭へ</a></footer>
+<script>
+const q=document.getElementById('q'),S=[...document.querySelectorAll('section')];
+q.oninput=()=>{const v=q.value.trim().toLowerCase();S.forEach(s=>{const hit=!v||s.textContent.toLowerCase().includes(v);s.style.display=hit?'':'none';if(v&&hit)s.querySelectorAll('details').forEach(d=>d.open=d.textContent.toLowerCase().includes(v))})};
+</script>
+</body></html>
