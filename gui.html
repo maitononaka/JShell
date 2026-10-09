@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>JShell GUI</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{--ac:#0078d4;--bg:#202020;--fg:#fff;--p:#2b2b2b;--p2:#3a3a3a;--wall:#0b3d91}
+:root.light{--bg:#f3f3f3;--fg:#111;--p:#fff;--p2:#e3e3e3}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font:13px "Segoe UI","Yu Gothic UI",system-ui,sans-serif;color:var(--fg);background:#000;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}input,textarea,[contenteditable=true],.term,.bd textarea{user-select:text;-webkit-user-select:text;-webkit-touch-callout:default}
+.material-icons{font-size:20px;vertical-align:middle}
+.hide{display:none!important}
+input,textarea,button{font:inherit;color:inherit}
+input{background:var(--p2);border:1px solid #777;padding:6px 8px;outline:0}input:focus{border-color:var(--ac)}
+button{background:transparent;border:0;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+button:hover{background:rgba(128,128,128,.28)}
+.pri{background:var(--ac);color:#fff}.danger{background:#b00020;color:#fff}
+.sp{flex:1}.err{color:#ff8a8a;min-height:18px}.em{opacity:.6;padding:8px}.hint{opacity:.6;margin-top:18px;cursor:pointer}
+.scr{position:fixed;inset:0;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);z-index:1000;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center}
+.spin{animation:r 1s linear infinite;margin-top:20px}@keyframes r{to{transform:rotate(360deg)}}
+.lg{display:flex;flex-direction:column;align-items:center;gap:10px;width:270px}
+.lg .big{position:fixed;top:12vh;left:0;right:0;font-size:64px;font-weight:200}
+.av .material-icons{font-size:110px}.pw{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+#desk{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);bottom:calc(44px + env(safe-area-inset-bottom,0px));background:linear-gradient(135deg,var(--wall),#000 170%);overflow:hidden}
+#ic{position:absolute;inset:0;pointer-events:none}.di{position:absolute;width:84px;min-height:76px;text-align:center;padding:8px 4px;color:#fff;cursor:default;pointer-events:auto;touch-action:none;overflow-wrap:anywhere}.di.dragging{opacity:.65;z-index:10}.di .label{display:block;line-height:1.25;text-shadow:0 1px 3px #000}.drop-hint{display:none!important}#desk.drop-target{outline:3px dashed #72b8ff;outline-offset:-8px}
+.di .material-icons{font-size:44px;display:block;margin:auto}.di:hover{background:rgba(255,255,255,.15)}
+#tbar{position:fixed;left:0;right:0;bottom:0;height:calc(44px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)!important;background:var(--p);border-top:1px solid var(--p2);display:flex;align-items:center;gap:2px;padding:0 6px;z-index:500}
+#tbar button{height:36px;max-width:170px}#tbar button.on{background:rgba(128,128,128,.3);box-shadow:inset 0 -3px var(--ac)}
+#tbar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.div{width:1px;height:24px;background:var(--p2);margin:0 4px}
+#clk{text-align:right;font-size:11px;padding:0 8px;white-space:nowrap}
+#start{position:fixed;left:6px;bottom:calc(50px + env(safe-area-inset-bottom,0px));width:260px;background:var(--p);border:1px solid var(--p2);z-index:600;padding:6px;display:flex;flex-direction:column;box-shadow:0 8px 30px #0008}
+#start button,#ctx button{justify-content:flex-start;padding:9px 10px}#start hr{width:100%;border:0;border-top:1px solid var(--p2)}
+#ctx{position:fixed;z-index:700;background:color-mix(in srgb,var(--p) 88%,#ddd 12%);backdrop-filter:blur(24px);border:1px solid #ffffff35;border-radius:8px;display:flex;flex-direction:column;width:220px;padding:4px;box-shadow:0 8px 28px #0006}#ctx button{min-height:36px;border-radius:4px}#ctx .menu-sep{height:1px;background:var(--p2);margin:4px 2px}#ctx .menu-arrow{margin-left:auto;opacity:.65}#ctx .menu-sub{font-size:11px;opacity:.6;margin-left:auto}.dlg-shade{position:fixed;inset:0;z-index:3000;background:#0007;display:flex;align-items:center;justify-content:center;padding:20px}.dlg{width:min(390px,94vw);background:var(--p);border:1px solid var(--p2);border-radius:9px;box-shadow:0 16px 50px #0008;padding:18px;color:var(--fg)}.dlg h3{font-size:16px;font-weight:500;margin:0 0 12px}.dlg p{white-space:pre-wrap;overflow-wrap:anywhere}.dlg input{width:100%;margin:8px 0 14px}.dlg .dlg-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:16px}
+.win{position:absolute;display:flex;flex-direction:column;background:var(--p);border:1px solid var(--ac);box-shadow:0 8px 30px #0008;resize:both;overflow:hidden;min-width:260px;min-height:160px}
+.win.max{inset:0!important;width:auto!important;height:auto!important;resize:none}
+.tb{display:flex;align-items:center;gap:6px;height:32px;padding-left:8px;background:var(--p2);touch-action:none}
+.tb b{font-weight:400;white-space:nowrap;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.tb button{height:32px;width:42px;padding:0;flex:none;justify-content:center;overflow:hidden;touch-action:manipulation}.tb .x:hover{background:#e81123;color:#fff}
+.noicon .tb .material-icons{display:none}.noicon .tb button::before{content:attr(data-s);font-size:18px}
+.bd{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.term{flex:1;overflow:auto;background:#0c0c0c;color:#ccc;font:14px Consolas,monospace;padding:6px;user-select:text}
+.term .out{white-space:pre-wrap;word-break:break-all}.in{display:flex}.in input{flex:1;background:none;border:0;color:inherit;font:inherit;padding:0}
+.bar{display:flex;align-items:center;gap:4px;padding:4px;border-bottom:1px solid var(--p2)}.addr{flex:1}
+.xp{flex:1;display:flex;min-height:0}.side{width:170px;border-right:1px solid var(--p2);overflow:auto;padding:4px;display:flex;flex-direction:column}
+.side button{justify-content:flex-start}.side .on,.it.on,summary.on{background:color-mix(in srgb,var(--ac) 40%,transparent)}
+.list{flex:1;overflow:auto;padding:6px}.it{display:flex;align-items:center;gap:8px;padding:5px 6px;cursor:default;touch-action:pan-y}.it .v{margin-left:auto;opacity:.7}.file-ctx-note{padding:7px 10px;opacity:.55;border-bottom:1px solid var(--p2);font-size:11px}.tm-toolbar{display:flex;align-items:center;gap:8px;padding:7px;border-bottom:1px solid var(--p2)}.tm-summary{opacity:.65;margin-left:auto;font-size:11px}.tm-table{width:100%;border-collapse:collapse;white-space:nowrap}.tm-table th,.tm-table td{padding:7px;border-bottom:1px solid var(--p2);text-align:left}.tm-table th{position:sticky;top:0;background:var(--p);font-weight:500}.tm-table-wrap{overflow:auto;flex:1;min-height:0}.html-frame{display:block;width:100%;height:100%;border:0;background:#fff;flex:1;min-height:0}
+.bd textarea{flex:1;resize:none;background:var(--p);border:0;outline:0;padding:8px;font:14px Consolas,monospace;user-select:text}
+.pg h3{margin:14px 0 6px}.sw{display:inline-block;width:34px;height:34px;margin:4px;cursor:pointer;border:2px solid transparent}.sw:hover{border-color:var(--fg)}
+details{padding-left:12px}summary{cursor:default;list-style:none;padding:2px 4px;white-space:nowrap}
+#uefi{background:#00a;font-family:Consolas,monospace;align-items:stretch;text-align:left}
+.ub{margin:auto;width:min(1100px,96vw);height:min(780px,92vh);display:flex;flex-direction:column;font-size:17px;border:2px solid #aaa;background:#008}.ut{display:flex;background:#aaa}
+.ut button{color:#000;padding:12px 22px}.ut .on{background:#00a;color:#fff}.uc{padding:20px;flex:1;overflow:auto}
+.ur{display:flex;justify-content:space-between;width:100%;padding:10px 12px;gap:20px}button.ur:hover{background:#fff;color:#000}
+.ub .hint{padding:8px 12px;margin:0;border-top:1px solid #aaa;cursor:default}
+.tl{display:flex;align-items:center;white-space:nowrap;padding:2px 4px;cursor:default}.tl:hover{background:rgba(128,128,128,.2)}.tl.on{background:color-mix(in srgb,var(--ac) 40%,transparent)}
+.tp{font:13px Consolas,monospace;white-space:pre;opacity:.45}.tl .material-icons{margin-right:5px;color:var(--ac)}.side.tr{width:min(270px,46%)}.it.bad{color:#ff7b7b}
+.ur.sel{background:#fff;color:#000}
+#bsod,#re{background:#0a62b4;align-items:flex-start;text-align:left;overflow:auto}#bsod{z-index:2000}
+#bsod>div{margin:7vh 7vw;max-width:900px}#bsod .sad{font-size:min(20vw,140px);line-height:1;margin-bottom:10px}#bsod p{font-size:min(5vw,24px);margin:14px 0;line-height:1.5}#bsod small{font-size:13px;display:block;margin-top:8px;opacity:.9}
+.re{width:100%;padding:6vh 6vw}.re h1{font-weight:300;font-size:30px;margin:0 0 26px}.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;align-items:start}
+.ri{display:flex;gap:16px;padding:14px;border:2px solid transparent;background:rgba(255,255,255,.1);text-align:left;align-items:flex-start;width:100%;color:#fff}
+.ri .material-icons{font-size:34px;flex:none;width:34px;height:34px;overflow:hidden}.ri>div{min-width:0}.ri b{font-weight:400;font-size:18px;display:block}.ri .d{font-size:12px;opacity:.85;display:block;margin-top:3px}.ri.sel,.ri:hover{border-color:#fff;background:rgba(255,255,255,.2)}
+.rb{display:inline-flex;gap:10px;align-items:center;margin-bottom:24px;cursor:pointer}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wc{to{opacity:0;transform:scale(.95)}}
+.win{animation:pop .16s ease-out}.win.closing{animation:wc .14s ease-in forwards;pointer-events:none}
+#start:not(.hide),#ctx:not(.hide){animation:up .15s ease-out}#desk:not(.hide){animation:fade .5s}.scr{animation:fade .3s}.lg{animation:up .4s ease-out}
+button,.tl,.it,.di{transition:background .12s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id=boot class=scr><div><span class=material-icons style="font-size:64px">window</span><div>JShell GUI</div><span class="material-icons spin">autorenew</span></div></div>
+<div id=login class="scr hide"></div>
+<div id=desk class=hide><div id=ic></div></div>
+<div id=tbar class=hide></div><div id=start class=hide></div><div id=ctx class=hide></div>
+<div id=uefi class="scr hide"></div><div id=bsod class="scr hide"></div><div id=re class="scr hide"></div>
+<script>
+const $=s=>document.querySelector(s),ico=n=>`<span class="material-icons">${n}</span>`,
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+shellArgs=s=>{const a=[];let c='',q=null;for(let i=0;i<s.length;i++){const x=s[i];if(q){if(x===q)q=null;else if(x==='\\'&&i+1<s.length&&(s[i+1]===q||s[i+1]==='\\'))c+=s[++i];else c+=x}else if(x==='"'||x==="'")q=x;else if(/\s/.test(x)){if(c){a.push(c);c=''}}else c+=x}if(c)a.push(c);return a};
+const KEY='jshell-gui-v1';
+const DEF=()=>({user:null,pass:null,fs:null,trash:[],reg:{HKEY_LOCAL_MACHINE:{SYSTEM:{Boot:{BootDelay:'1200',SecureBoot:'Enabled',FastBoot:'Disabled'}},SOFTWARE:{JShell:{Version:'2.0.0'}}},HKEY_CURRENT_USER:{Software:{JShell:{Theme:'dark',Accent:'#0078d4',Wallpaper:'#0b3d91'}}}}});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch{}S=S||DEF();
+function MsgBox(message,title='JShell GUI',buttons=['OK']){return new Promise(resolve=>{const sh=document.createElement('div');sh.className='dlg-shade';sh.innerHTML=`<div class=dlg role=dialog aria-modal=true><h3>${esc(title)}</h3><p>${esc(message)}</p><div class=dlg-actions>${buttons.map((b,i)=>`<button class="${i===buttons.length-1?'pri':''}" data-v="${esc(b)}">${esc(b)}</button>`).join('')}</div></div>`;document.body.appendChild(sh);sh.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;sh.remove();resolve(v)});sh.querySelector('button')?.focus()})}
+function InputBox(message,defaultValue='',title='JShell GUI'){return new Promise(resolve=>{const sh=document.createElement('div');sh.className='dlg-shade';sh.innerHTML=`<div class=dlg role=dialog aria-modal=true><h3>${esc(title)}</h3><p>${esc(message)}</p><input id=dlginput><div class=dlg-actions><button data-cancel>キャンセル</button><button class=pri data-ok>OK</button></div></div>`;document.body.appendChild(sh);const i=sh.querySelector('input');i.value=defaultValue;const done=v=>{sh.remove();resolve(v)};sh.querySelector('[data-cancel]').onclick=()=>done(null);sh.querySelector('[data-ok]').onclick=()=>done(i.value);i.onkeydown=e=>{if(e.key==='Enter')done(i.value);if(e.key==='Escape')done(null)};i.focus();i.select()})}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){MsgBox('保存できません: '+e.name,'エラー')}};
+const BOOT=()=>(((S.reg.HKEY_LOCAL_MACHINE||={}).SYSTEM||={}).Boot||={}),RK=()=>(((S.reg.HKEY_CURRENT_USER||={}).Software||={}).JShell||={});
+const HEX=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i,EN=v=>v=='Enabled'||v=='Disabled',UK='HKEY_CURRENT_USER/Software/JShell',BK='HKEY_LOCAL_MACHINE/SYSTEM/Boot';
+const RULES=[[UK,'Theme',v=>v=='dark'||v=='light'],[UK,'Accent',v=>HEX.test(v)],[UK,'Wallpaper',v=>HEX.test(v)],[BK,'BootDelay',v=>/^\d{1,5}$/.test(v)&&+v<=60000],[BK,'SecureBoot',EN],[BK,'FastBoot',EN]];
+const regAt=p=>p.split('/').filter(Boolean).reduce((o,k)=>o&&typeof o[k]=='object'?o[k]:undefined,S.reg);
+const ensure=p=>p.split('/').filter(Boolean).reduce((o,k)=>(typeof o[k]!='object'?o[k]={}:0,o[k]),S.reg);
+const badReg=()=>RULES.filter(([p,k,f])=>{const o=regAt(p);return !o||typeof o[k]!='string'||!f(o[k])}).map(([p,k])=>p+'/'+k);
+const defVal=(p,k)=>p.split('/').reduce((o,x)=>o[x],DEF().reg)[k],needRE=()=>badReg().length>0||(S.crash||0)>=2;
+let reKd=null,crashed=0;
+function reOff(){if(reKd){removeEventListener('keydown',reKd);reKd=null}}
+function chk(){const b=badReg();if(!b.length)return 0;bsod('CRITICAL_REGISTRY_VALUE',b[0].replace(/\//g,'\\'));return 1}
+function bsod(code,what){if(crashed)return;crashed=1;S.crash=(S.crash||0)+1;save();wins.forEach(w=>w.el.remove());wins.clear();hideAll();const B=$('#bsod');B.classList.remove('hide');
+ B.innerHTML=`<div><div class=sad>:(</div><p>お使いの PC で問題が発生したため、再起動する必要があります。エラー情報を収集しています。自動的に再起動します。</p><p><span id=bp>0</span>% 完了</p><small>このエラーに関する情報は、https://maitononaka.github.io/JShell/support/index.html で確認できます。</small><small>サポート担当者に連絡する場合は、次の情報を伝えてください:<br>停止コード: ${esc(code||'CRITICAL_PROCESS_DIED')}<br>失敗した内容: ${esc(String(what||'jshell.sys').slice(0,160))}</small></div>`;
+ let n=0;const iv=setInterval(()=>{n=Math.min(100,n+1+Math.floor(Math.random()*9));$('#bp').textContent=n;if(n>=100){clearInterval(iv);B.firstChild.insertAdjacentHTML('beforeend','<p>再起動します...</p>');setTimeout(()=>{crashed=0;boot()},1500)}},280)}
+function reSpin(t){reOff();hideAll();const R=$('#re');R.classList.remove('hide');R.onclick=null;R.innerHTML=`<div class=re style="text-align:center;padding-top:22vh"><span class="material-icons spin" style="font-size:52px">autorenew</span><h1 style="margin-top:20px">${t}</h1></div>`}
+function reNote(t,p,fn,btn='OK'){reOff();hideAll();const R=$('#re');R.classList.remove('hide');
+ R.innerHTML=`<div class=re><h1>${t}</h1><p style="max-width:720px;line-height:1.7">${p}</p><div class=rg style="max-width:360px"><button class="ri sel" data-a=1>${ico('check')}<div><b>${btn}</b></div></button></div></div>`;
+ R.onclick=e=>{if(e.target.closest('[data-a]'))(fn||(()=>reShow('adv')))()};reKd=e=>{if(e.key=='Enter'||e.key=='Escape'){e.preventDefault();R.onclick({target:R.querySelector('[data-a]')})}};addEventListener('keydown',reKd)}
+function autoRepair(){reSpin('自動修復を準備しています');setTimeout(()=>reSpin('PC を診断中...'),2200);setTimeout(()=>{reOff();const R=$('#re'),b=badReg();
+ R.innerHTML=`<div class=re><h1>PC が正常に起動しませんでした</h1><p style="max-width:720px;line-height:1.7">自動修復で PC を修復できませんでした。[再起動] を押して PC を再起動すると、問題が解決できることがあります。[詳細オプション] を押して、その他の方法で PC を修復することもできます。</p>${b.length?`<p style="font:12px Consolas,monospace;opacity:.85">原因: 無効なレジストリ値 ${esc(b[0].replace(/\//g,'\\'))}</p>`:''}<div class=rg style="max-width:420px"><button class="ri sel" data-a=r>${ico('restart_alt')}<div><b>再起動</b></div></button><button class=ri data-a=o>${ico('tune')}<div><b>詳細オプション</b></div></button></div></div>`;
+ R.onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a=='r')boot();if(a=='o')reShow('main')}},5000)}
+function repair(){reSpin('PC を診断中...');setTimeout(()=>{const bad=badReg();if(!bad.length)return reNote('スタートアップ修復','問題は見つかりませんでした。');
+ for(const b of bad){const i=b.lastIndexOf('/'),pa=b.slice(0,i),k=b.slice(i+1);ensure(pa)[k]=defVal(pa,k)}S.crash=0;save();reNote('スタートアップ修復',`修復が完了しました。${bad.length} 個のレジストリ値を修復しました。`,()=>boot(),'再起動')},2400)}
+function restore(){if(!S.lastGood)return reNote('システムの復元','復元ポイントが見つかりません。');reSpin('システムを復元しています...');setTimeout(()=>{S.reg=JSON.parse(JSON.stringify(S.lastGood));S.crash=0;save();reNote('システムの復元','復元が完了しました。',()=>boot(),'再起動')},2400)}
+function reReset(){MsgBox('すべてのデータを削除して初期化します。よろしいですか？','確認',['キャンセル','削除']).then(v=>{if(v==='削除'){localStorage.removeItem(KEY);location.reload()}})}
+function reCmd(){reOff();hideAll();const R=$('#re');R.classList.remove('hide');R.onclick=null;
+ R.innerHTML='<div class=re style="background:#000;min-height:100%;font:14px Consolas,monospace;user-select:text;padding:14px"><div id=co></div><div style="display:flex">X:\\Sources&gt;&nbsp;<input id=ci style="flex:1;background:none;border:0;color:#fff;font:inherit;padding:0" autocapitalize=none autocomplete=off></div></div>';
+ const co=$('#co'),ci=$('#ci'),pr=t=>{const d=document.createElement('div');d.textContent=t||' ';co.appendChild(d)};pr('JShell Recovery Console [Version 2.0.0]');pr('Type help for a list of commands.');
+ ci.onkeydown=e=>{if(e.key!='Enter')return;const c=ci.value.trim().toLowerCase();ci.value='';pr('X:\\Sources> '+c);
+  if(c=='help')pr('help  reg  repair  restore  exit');else if(c=='reg'){const b=badReg();b.length?b.forEach(x=>pr('INVALID '+x.replace(/\//g,'\\'))):pr('No registry problems found.')}else if(c=='repair')repair();else if(c=='restore')restore();else if(c=='exit')reShow('adv');else if(c)pr(`'${c}' is not recognized.`)};ci.focus()}
+const REP={main:{t:'オプションの選択',items:[['arrow_forward','続行','終了して JShell GUI に続行します',()=>boot()],['album','デバイスの使用','USB ドライブ、ネットワーク接続、または JShell 回復 DVD を使用します',()=>reNote('デバイスの使用','利用できるデバイスが見つかりません。',()=>reShow('main'))],['build','トラブルシューティング','PC の初期化または詳細オプションを表示します','ts'],['power_settings_new','PC の電源を切る','',()=>power('off')]]},
+ ts:{t:'トラブルシューティング',back:'main',items:[['restart_alt','このPCを初期状態に戻す','すべてのデータを削除して JShell GUI を初期状態に戻します',reReset],['tune','詳細オプション','スタートアップ修復、システムの復元など','adv']]},
+ adv:{t:'詳細オプション',back:'ts',items:[['build_circle','スタートアップ修復','JShell GUI の読み込みを妨げている問題を修復します',repair],['settings','スタートアップ設定','JShell GUI のスタートアップ動作を変更します',()=>reNote('スタートアップ設定','この機能は現在利用できません。')],['memory','UEFI ファームウェアの設定','PC の UEFI ファームウェアの設定を変更します',()=>uefi()],['terminal','コマンド プロンプト','詳細なトラブルシューティングのためにコマンド プロンプトを使います',reCmd],['history','システムの復元','最後に保存された復元ポイントを使って JShell GUI を復元します',restore],['system_update_alt','更新プログラムのアンインストール','最新の更新プログラムを削除します',()=>reNote('更新プログラムのアンインストール','アンインストールできる更新プログラムはありません。')]]}};
+function reShow(pg){reOff();hideAll();const R=$('#re'),P=REP[pg],n=P.items.length;let sel=0;R.classList.remove('hide');
+ R.innerHTML=`<div class=re>${P.back?`<div class=rb data-b=1>${ico('arrow_back')}<span style="font-size:22px">${P.t}</span></div>`:`<h1>${P.t}</h1>`}<div class=rg>${P.items.map(([i,t,d],k)=>`<button class="ri ${k?'':'sel'}" data-k=${k}>${ico(i)}<div><b>${t}</b><span class=d>${d}</span></div></button>`).join('')}</div><div class=hint style="cursor:default;margin-top:30px">Arrow keys: Select　Enter: OK　Esc: Back</div></div>`;
+ const go=k=>{const a=P.items[k][3];typeof a=='string'?reShow(a):a()},hl=()=>R.querySelectorAll('.ri').forEach((b,k)=>b.classList.toggle('sel',k==sel));
+ R.onclick=e=>{const b=e.target.closest('[data-k]');if(b)go(+b.dataset.k);else if(e.target.closest('[data-b]'))reShow(P.back)};
+ reKd=e=>{const k=e.key;if(k=='ArrowDown'||k=='ArrowRight')sel=(sel+1)%n;else if(k=='ArrowUp'||k=='ArrowLeft')sel=(sel+n-1)%n;else if(k=='Enter')go(sel);else if((k=='Escape'||k=='Backspace')&&P.back)reShow(P.back);else return;e.preventDefault();hl()};addEventListener('keydown',reKd)}
+function treeHTML(kids,mk,open,path='',pre=''){const a=kids(path);return a.map(([n,d],i)=>{const last=i==a.length-1,pp=path?path+'/'+n:n,o=d&&open.has(pp);return mk(n,d,pp,pre+(last?'└── ':'├── '),o)+(o?treeHTML(kids,mk,open,pp,pre+(last?'    ':'│   ')):'')}).join('')}
+function apply(){const r=RK(),s=document.documentElement.style;document.documentElement.classList.toggle('light',r.Theme=='light');s.setProperty('--ac',r.Accent||'#0078d4');s.setProperty('--wall',r.Wallpaper||'#0b3d91')}
+async function hash(t){if(!crypto.subtle)return btoa(unescape(encodeURIComponent(t)));const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+/* ---- virtual FS ---- */
+const seg=p=>p.split('/').filter(Boolean),get=p=>{let n=S.fs;for(const x of seg(p)){if(n.t!='d'||!n.c[x])return null;n=n.c[x]}return n};
+const par=p=>seg(p).slice(0,-1).join('/'),nm=p=>seg(p).pop()||'',dir=()=>({t:'d',c:{}}),file=d=>({t:'f',d}),home=()=>'Users/'+S.user;
+const put=(p,n)=>{const d=get(par(p));if(!d||d.t!='d')return 0;d.c[nm(p)]=n;save();return 1};
+function initFs(u){S.fs=dir();for(const p of['Users','Users/'+u,'Users/'+u+'/Desktop','Users/'+u+'/Documents','Users/'+u+'/Downloads','Windows'])put(p,dir());put('Users/'+u+'/Documents/welcome.txt',file('JShell GUI へようこそ。'))}
+const trashIt=p=>{const d=get(par(p)),n=nm(p);if(!d||!d.c[n])return 0;S.trash.push({n,node:d.c[n],from:p});delete d.c[n];save();dbin();return 1};
+const norm=(p,cwd)=>{const o=[],b=/^[A-Za-z]:/.test(p)||p[0]=='/'||p[0]=='\\'?p.replace(/^[A-Za-z]:/,''):cwd+'/'+p;for(const x of b.split(/[\\/]/)){if(!x||x=='.')continue;x=='..'?o.pop():o.push(x)}return o.join('/')};
+const disp=p=>'C:\\'+p.replaceAll('/','\\');
+/* ---- window manager ---- */
+const wins=new Map(),APPS={};let zi=10,wid=0,focused=0;
+function openApp(name,arg){const A=APPS[name];if(!A)return;
+ if(A.single)for(const w of wins.values())if(w.app==name){show(w);return w}
+ const id=++wid,el=document.createElement('div'),W=A.size||[640,420],o=(id%8)*26;el.className='win';
+ el.style.cssText=`left:${Math.max(0,Math.min(40+o,innerWidth-W[0]))}px;top:${24+o}px;width:${Math.min(W[0],innerWidth)}px;height:${Math.min(W[1],innerHeight-100)}px`;
+ el.innerHTML=`<div class=tb>${ico(A.icon)}<b></b><button data-a=min data-s="–">${ico('remove')}</button><button data-a=max data-s="□">${ico('crop_square')}</button><button data-a=close data-s="×" class=x>${ico('close')}</button></div><div class=bd></div>`;
+ const w={id,app:name,el,body:el.lastChild,A,min:false},tb=el.firstChild;w.title=t=>{el.querySelector('b').textContent=t};w.title(A.title);
+ wins.set(id,w);if(innerWidth<700)el.classList.add('max');$('#desk').appendChild(el);
+ el.addEventListener('pointerdown',()=>{if(focused!=w.id||w.min)show(w)},true);
+ tb.addEventListener('pointerdown',e=>{if(e.target.closest('button')||el.classList.contains('max'))return;const r=el.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;tb.setPointerCapture(e.pointerId);
+  const mv=ev=>{el.style.left=Math.max(60-r.width,Math.min(innerWidth-60,ev.clientX-dx))+'px';el.style.top=Math.max(0,Math.min(innerHeight-80,ev.clientY-dy))+'px'},
+  up=()=>{tb.removeEventListener('pointermove',mv);tb.removeEventListener('pointerup',up)};tb.addEventListener('pointermove',mv);tb.addEventListener('pointerup',up)});
+ tb.addEventListener('dblclick',e=>{if(!e.target.closest('button'))el.classList.toggle('max')});
+ tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;if(a=='close')closeW(w);if(a=='min')minW(w);if(a=='max')el.classList.toggle('max')});
+ A.init(w,arg);show(w);return w}
+function show(w){w.min=false;w.el.style.display='';w.el.style.zIndex=++zi;focused=w.id;tbar()}
+function minW(w){w.min=true;w.el.classList.add('closing');tbar();setTimeout(()=>{w.el.style.display='none';w.el.classList.remove('closing')},140)}
+function closeW(w){w.el.classList.add('closing');wins.delete(w.id);tbar();setTimeout(()=>w.el.remove(),140)}
+const closeAll=()=>[...wins.values()].forEach(closeW);
+function tbar(){const pins=[['explorer','folder'],['cmd','terminal'],['settings','settings']];
+ $('#tbar').innerHTML=`<button id=sb>${ico('window')}</button>`+pins.map(([a,i])=>`<button data-o=${a}>${ico(i)}</button>`).join('')+'<span class=div></span>'+
+ [...wins.values()].map(w=>`<button data-w=${w.id} class="${w.id==focused&&!w.min?'on':''}">${ico(w.A.icon)}<span>${esc(w.el.querySelector('b').textContent)}</span></button>`).join('')+`<i class=sp></i><div id=clk></div>`;clock()}
+$('#tbar').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='sb')return startMenu();if(b.dataset.o)openApp(b.dataset.o);
+ if(b.dataset.w){const w=wins.get(+b.dataset.w);!w.min&&focused==w.id?minW(w):show(w)}};
+const LIST=['explorer','cmd','notepad','taskmgr','settings','regedit','bin'];
+function startMenu(f){const s=$('#start'),open=f??s.classList.contains('hide');s.classList.toggle('hide',!open);
+ if(open)s.innerHTML=LIST.map(a=>`<button data-o=${a}>${ico(APPS[a].icon)}${APPS[a].title}</button>`).join('')+`<hr><button data-p=out>${ico('logout')}サインアウト</button><button data-p=re>${ico('restart_alt')}再起動</button><button data-p=fw>${ico('memory')}UEFIファームウェア設定</button><button data-p=rec>${ico('build')}回復環境</button><button data-p=off>${ico('power_settings_new')}シャットダウン</button>`}
+$('#start').onclick=e=>{const b=e.target.closest('button');if(!b)return;startMenu(false);if(b.dataset.o)openApp(b.dataset.o);if(b.dataset.p)power(b.dataset.p)};
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#start,#sb'))startMenu(false);if(!e.target.closest('#ctx'))$('#ctx').classList.add('hide')});
+function desktopMenu(x,y){const c=$('#ctx');c.dataset.menu='desktop';c.innerHTML=`
+ <button data-desk-menu="view">${ico('grid_view')}表示<span class="menu-arrow">›</span></button>
+ <button data-desk-menu="sort">${ico('sort')}並べ替え<span class="menu-arrow">›</span></button>
+ <button data-desk-menu="refresh">${ico('refresh')}最新の情報に更新</button><div class="menu-sep"></div>
+ <button data-desk-menu="undo">${ico('undo')}元に戻す - 名前の変更<span class="menu-sub">Ctrl+Z</span></button>
+ <button data-desk-menu="new">${ico('add_circle_outline')}新規作成<span class="menu-arrow">›</span></button><div class="menu-sep"></div>
+ <button data-o=settings>${ico('display_settings')}ディスプレイ設定</button><button data-o=settings>${ico('brush')}個人用設定</button><div class="menu-sep"></div>
+ <button data-o=cmd>${ico('terminal')}ターミナルで開く</button><div class="menu-sep"></div>
+ <button data-desk-menu="more">${ico('open_in_new')}その他のオプションを確認</button>`;
+ c.style.left=Math.max(4,Math.min(x,innerWidth-230))+'px';c.style.top=Math.max(4,Math.min(y,innerHeight-390))+'px';c.classList.remove('hide')}
+$('#desk').oncontextmenu=e=>{e.preventDefault();if(e.target.closest('.win,.di'))return;desktopMenu(e.clientX,e.clientY)};
+function alignDesktopGrid(sort=false){const root=get(home());if(!root||root.t!=='d')return;const names=Object.keys(root.c);if(sort)names.sort((a,b)=>a.localeCompare(b,'ja'));const cols=Math.max(1,Math.floor($('#desk').clientWidth/100));names.forEach((n,i)=>S.desktopPositions[home()+'/'+n]={x:12+(i%cols)*96,y:12+Math.floor(i/cols)*100});S.desktopPositions['__recycle__']={x:12+((names.length)%cols)*96,y:12+Math.floor(names.length/cols)*100};save();dbin()}
+$('#ctx').addEventListener('click',e=>{const b=e.target.closest('[data-desk-menu]');if(!b)return;const a=b.dataset.deskMenu;if(a==='view'){const c=$('#ctx');c.innerHTML=`<button data-desk-menu="grid">${ico('grid_on')}アイコンを等間隔に整列</button><button data-desk-menu="back">${ico('arrow_back')}戻る</button>`}else if(a==='sort'){alignDesktopGrid(true);$('#ctx').classList.add('hide')}else if(a==='grid'){alignDesktopGrid(false);$('#ctx').classList.add('hide')}else if(a==='refresh'){dbin();$('#ctx').classList.add('hide')}else if(a==='new'){const c=$('#ctx');c.innerHTML=`<button data-desk-menu="newfolder">${ico('create_new_folder')}フォルダー</button><button data-desk-menu="newfile">${ico('note_add')}テキスト ドキュメント</button><button data-desk-menu="back">${ico('arrow_back')}戻る</button>`}else if(a==='newfolder'||a==='newfile'){const typ=a;InputBox(typ==='newfolder'?'フォルダー名':'ファイル名',typ==='newfile'?'新しいテキスト.txt':'新しいフォルダー').then(n=>{if(n&&!/[\/]/.test(n)){put(home()+'/'+n,typ==='newfolder'?dir():file(''));save();dbin()}});$('#ctx').classList.add('hide')}else if(a==='back')desktopMenu(20,20);else if(a==='undo'||a==='more'){$('#ctx').classList.add('hide')}});
+$('#ctx').onclick=e=>{const f=e.target.closest('[data-file-action]');if(f){fileContextAction(f.dataset.fileAction);return}const b=e.target.closest('button');if(b&&b.dataset.o){openApp(b.dataset.o);$('#ctx').classList.add('hide')}};
+function clock(){const d=new Date(),t=d.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),c=$('#clk'),l=$('#lt');if(c)c.innerHTML=t+'<br>'+d.toLocaleDateString('ja-JP');if(l)l.textContent=t}
+setInterval(clock,1000);
+/* ---- boot / login / power ---- */
+const hideAll=()=>{reOff();for(const i of['boot','login','uefi','desk','tbar','start','ctx','bsod','re'])$('#'+i).classList.add('hide');const o=$('#off');o&&o.remove()};
+function boot(){apply();hideAll();$('#boot').classList.remove('hide');const b=BOOT(),bd=parseInt(b.BootDelay),d=b.FastBoot=='Enabled'?300:(isNaN(bd)?1200:bd);let done=0,t;
+ let n=0;const go=f=>{if(done)return;done=1;clearTimeout(t);removeEventListener('keydown',kd);removeEventListener('pointerdown',pd);f()},
+ kd=e=>{if(['F2','Delete','Escape'].includes(e.key)||(e.key=='Enter'&&++n>=3)){e.preventDefault();go(uefi)}},pd=()=>{if(++n>=3)go(uefi)};
+ addEventListener('keydown',kd);addEventListener('pointerdown',pd);t=setTimeout(()=>go(()=>needRE()?autoRepair():S.user?loginScr():setupScr()),d)}
+const wall=()=>`linear-gradient(135deg,${RK().Wallpaper||'#0b3d91'},#000 170%)`;
+function loginScr(){hideAll();const L=$('#login');L.style.background=wall();L.classList.remove('hide');
+ L.innerHTML=`<div class=lg><div class=big id=lt></div><div class=av>${ico('account_circle')}</div><h2>${esc(S.user)}</h2>${S.pass?'<input id=lp type=password placeholder=パスワード>':''}<div id=le class=err></div><button id=lb class=pri>${ico('arrow_forward')}サインイン</button></div><div class=pw><button onclick="power('re')">${ico('restart_alt')}</button><button onclick="power('off')">${ico('power_settings_new')}</button></div>`;clock();
+ const go=async()=>{if(S.pass&&await hash($('#lp').value)!=S.pass){$('#le').textContent='パスワードが正しくありません';$('#lp').value='';return}desktop()};
+ $('#lb').onclick=go;const p=$('#lp');if(p){p.onkeydown=e=>{if(e.key=='Enter')go()};p.focus()}}
+function setupScr(){hideAll();const L=$('#login');L.style.background=wall();L.classList.remove('hide');
+ L.innerHTML=`<div class=lg><div class=av>${ico('person_add')}</div><h2>アカウントの作成</h2><input id=su placeholder=ユーザー名><input id=sp type=password placeholder="パスワード（空欄で無し）"><div id=le class=err></div><button id=lb class=pri>${ico('check')}作成</button></div>`;
+ $('#lb').onclick=async()=>{const u=$('#su').value.trim();if(!/^[\w.-]{1,24}$/.test(u)){$('#le').textContent='ユーザー名は英数字と . _ - のみ（24文字まで）';return}
+  S.user=u;S.pass=$('#sp').value?await hash($('#sp').value):null;initFs(u);save();desktop()}}
+function desktop(){hideAll();apply();S.crash=0;if(!badReg().length)S.lastGood=JSON.parse(JSON.stringify(S.reg));save();$('#desk').classList.remove('hide');$('#tbar').classList.remove('hide');dbin();tbar()}
+function dbin(){
+ const host=$('#ic'); if(!S.desktopPositions)S.desktopPositions={};
+ const root=get(home()),items=[];
+ if(root&&root.t==='d')Object.entries(root.c).forEach(([name,node])=>items.push({path:home()+'/'+name,name,folder:node.t==='d'}));
+ items.push({path:'__recycle__',name:'ごみ箱',folder:true,bin:true});
+ host.innerHTML=items.map((it,i)=>{const key=it.path,pos=S.desktopPositions[key]||{x:12+(Math.floor(i/7)*92),y:12+(i%7)*94};return `<div class="di" data-path="${esc(key)}" style="left:${Math.max(0,pos.x)}px;top:${Math.max(0,pos.y)}px">${ico(it.bin?(S.trash.length?'delete':'delete_outline'):it.folder?'folder':'insert_drive_file')}<span class="label">${esc(it.name)}</span></div>`}).join('');
+ host.querySelectorAll('.di').forEach(el=>{let timer=0,start=null,moved=false;const path=el.dataset.path;
+ el.addEventListener('pointerdown',e=>{if(e.button===2)return;start={x:e.clientX,y:e.clientY,l:parseFloat(el.style.left)||0,t:parseFloat(el.style.top)||0};moved=false;el.setPointerCapture?.(e.pointerId);timer=setTimeout(()=>{if(start&&!moved){showDesktopContext(path,e.clientX,e.clientY)}},620)});
+ el.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.hypot(dx,dy)>7){moved=true;clearTimeout(timer);el.classList.add('dragging');el.style.left=Math.max(0,Math.min($('#desk').clientWidth-84,start.l+dx))+'px';el.style.top=Math.max(0,Math.min($('#desk').clientHeight-80,start.t+dy))+'px'}});
+ const end=()=>{clearTimeout(timer);if(start&&moved){S.desktopPositions[path]={x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0};save()}start=null;el.classList.remove('dragging')};el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+ el.addEventListener('dblclick',()=>{if(path==='__recycle__')openApp('bin');else openFile(path)});
+ el.addEventListener('contextmenu',e=>{e.preventDefault();showDesktopContext(path,e.clientX,e.clientY)});
+ });
+}
+function showDesktopContext(path,x,y){const c=$('#ctx');if(path==='__recycle__'){c.innerHTML=`<button data-desk-action="bin">${ico('delete')}ごみ箱を開く</button>`}else{const n=get(path),html=/\.html?$/i.test(nm(path));c.innerHTML=`<div class="file-ctx-note">${esc(nm(path))}</div><button data-desk-action="open">${ico(n&&n.t==='d'?'folder_open':'open_in_new')}開く</button>${n&&n.t==='f'?`<button data-desk-action="edit">${ico('edit')}メモ帳で編集</button>${html?`<button data-desk-action="tab">${ico('open_in_new')}別タブで実行</button><button data-desk-action="window">${ico('web_asset')}ウィンドウで実行</button>`:''}`:''}`;}
+ c.dataset.deskPath=path;c.style.left=Math.max(4,Math.min(x,innerWidth-210))+'px';c.style.top=Math.max(4,Math.min(y,innerHeight-190))+'px';c.classList.remove('hide')}
+$('#ctx').addEventListener('click',e=>{const b=e.target.closest('[data-desk-action]');if(!b)return;const a=b.dataset.deskAction,path=$('#ctx').dataset.deskPath;$('#ctx').classList.add('hide');if(a==='bin')openApp('bin');else if(a==='open')openFile(path);else if(a==='edit')openApp('notepad',{path});else if(a==='tab')runHtmlInNewTab(path);else if(a==='window')openApp('htmlapp',{path})});
+const desk=$('#desk');
+ desk.addEventListener('dragover',e=>{e.preventDefault();desk.classList.add('drop-target');if(e.dataTransfer)e.dataTransfer.dropEffect='copy'});
+ desk.addEventListener('dragleave',e=>{if(!desk.contains(e.relatedTarget))desk.classList.remove('drop-target')});
+ desk.addEventListener('drop',async e=>{e.preventDefault();desk.classList.remove('drop-target');const files=[...(e.dataTransfer?.files||[])];if(!files.length)return;let x=Math.max(0,e.clientX-42),y=Math.max(0,e.clientY-38),count=0;for(const f of files){let name=f.name||'dropped-file';if(/[\\/]/.test(name))name=name.replace(/[\\/]/g,'_');let base=name,k=2;while(get(home()+'/'+name))name=base.replace(/(\.[^.]+)?$/,` (${k++})$1`);try{const data=await f.text();put(home()+'/'+name,file(data));S.desktopPositions[home()+'/'+name]={x:x+(count%3)*14,y:y+(count%3)*14};count++;}catch(err){console.warn('Could not import dropped file',name,err)}}save();dbin();});
+ document.addEventListener('dragend',()=>desk.classList.remove('drop-target'));
+ document.addEventListener('selectstart',e=>{if(e.target.closest('input,textarea,[contenteditable=true],.term'))return;e.preventDefault()});
+function power(k){closeAll();hideAll();if(k=='out')loginScr();else if(k=='re')boot();else if(k=='fw')uefi();else if(k=='rec')reShow('main');
+ else document.body.insertAdjacentHTML('beforeend','<div id=off class=scr onclick="boot()"><div><span class=material-icons style="font-size:48px">power_settings_new</span><div class=hint>シャットダウンしました。クリックで電源オン</div></div></div>')}
+/* ---- UEFI ---- */
+function uefi(){hideAll();closeAll();const U=$('#uefi');U.classList.remove('hide');const b=BOOT(),v={d:parseInt(b.BootDelay)||0,s:b.SecureBoot=='Enabled',f:b.FastBoot=='Enabled'},T=['Main','Boot','Security','Exit'],DL=[0,300,600,1200,3000,5000],t0=Date.now();let tab=0,sel=0;
+ const ro=(l,v)=>({l,v}),rows=()=>[
+  [ro('Firmware','JShell UEFI 2.0'),ro('CPU threads',navigator.hardwareConcurrency||'?'),ro('Memory hint',(navigator.deviceMemory||'?')+' GB'),ro('Display',screen.width+'x'+screen.height),ro('User',S.user||'(none)')],
+  [{l:'Boot Delay',v:v.d+' ms',a:()=>v.d=DL[(DL.indexOf(v.d)+1)%DL.length]},{l:'Fast Boot',v:v.f?'Enabled':'Disabled',a:()=>v.f=!v.f}],
+  [{l:'Secure Boot (virtual)',v:v.s?'Enabled':'Disabled',a:()=>v.s=!v.s}],
+  [{l:'Save Changes and Exit (F10)',v:'',a:()=>exit(1)},{l:'Discard Changes and Exit (Esc)',v:'',a:()=>exit(0)}]][tab],act=r=>r.filter(x=>x.a);
+ const render=()=>{const R=rows(),A=act(R);if(sel>=A.length)sel=0;
+  U.innerHTML=`<div class=ub><div class=ut>${T.map((n,i)=>`<button data-t=${i} class="${i==tab?'on':''}">${n}</button>`).join('')}</div><div class=uc>${R.map(x=>x.a?`<button class="ur ${x==A[sel]?'sel':''}" data-i=${A.indexOf(x)}><span>${x.l}</span><span>${x.v}</span></button>`:`<div class=ur><span>${x.l}</span><span>${esc(x.v)}</span></div>`).join('')}</div><div class=hint>←→ : Select Tab　↑↓ : Select Item　Enter : Change Value　F10 : Save &amp; Exit　Esc : Discard &amp; Exit</div></div>`},
+ exit=sv=>{removeEventListener('keydown',kd);if(sv){b.BootDelay=String(v.d);b.SecureBoot=v.s?'Enabled':'Disabled';b.FastBoot=v.f?'Enabled':'Disabled';save()}boot()},
+ kd=e=>{const A=act(rows()),k=e.key;let h=1;
+  if(k=='F10')exit(1);else if(k=='Escape')exit(0);else if(k=='ArrowRight'){tab=(tab+1)%4;sel=0}else if(k=='ArrowLeft'){tab=(tab+3)%4;sel=0}
+  else if(k=='ArrowDown'&&A.length)sel=(sel+1)%A.length;else if(k=='ArrowUp'&&A.length)sel=(sel+A.length-1)%A.length;
+  else if((k=='Enter'||k==' ')&&A[sel]){if(Date.now()-t0<600){e.preventDefault();return}A[sel].a()}else h=0;
+  if(h){e.preventDefault();render()}};
+ addEventListener('keydown',kd);
+ U.onclick=e=>{const t=e.target.closest('button');if(!t)return;if(t.dataset.t!=null){tab=+t.dataset.t;sel=0}else{sel=+t.dataset.i;act(rows())[sel].a()}render()};render()}
+/* ---- apps ---- */
+APPS.cmd={title:'シェル',icon:'terminal',size:[700,420],init(w){
+ w.body.innerHTML='<div class=term><div class=out></div><div class=in><span class=ps></span><input spellcheck=false autocapitalize=none autocomplete=off></div></div>';
+ const T=w.body.firstChild,out=T.querySelector('.out'),inp=T.querySelector('input'),ps=T.querySelector('.ps'),coarse=matchMedia('(pointer:coarse)').matches;let cwd=home(),hist=[],hi=0;
+ const pr=(t='')=>{const d=document.createElement('div');d.textContent=t||' ';out.appendChild(d)},loc=p=>p==home()?'~':p.startsWith(home()+'/')?'~'+p.slice(home().length):'/'+p,pmt=()=>ps.textContent=`${S.user}@jshell:${loc(cwd)}> `,
+ N=p=>norm(p.replace(/^~/,'/'+home()),cwd),fl=a=>a.filter(x=>!x.startsWith('-'));
+ pr('JShell GUI 2.0.0');pr('help でコマンド一覧を表示します。');pr();pmt();
+ const C={
+  help(){pr('help ver clear echo ls cd pwd cat mkdir touch rm whoami date ps taskmgr top kill reg sfc crash recovery start exit notepad');pr('start: explorer shell notepad taskmgr settings regedit bin');pr('notepad [FILE]  open the editor');pr('taskmgr         open Task Manager');pr('sfc --help      show virtual System File Checker options')},
+  ver(){pr('JShell GUI 2.0.0')},clear(){out.innerHTML=''},echo(a){pr(a.join(' '))},whoami(){pr(S.user)},date(){pr(new Date().toString())},pwd(){pr('/'+cwd)},
+  ls(a){a=fl(a);const p=a[0]?N(a[0]):cwd,n=get(p);if(!n)return pr(`ls: ${a[0]}: no such file or directory`);if(n.t!='d')return pr(nm(p));for(const[k,v]of Object.entries(n.c).sort())pr(k+(v.t=='d'?'/':''))},
+  cd(a){const p=a[0]?N(a.join(' ')):home(),n=get(p);if(!n||n.t!='d')return pr(`cd: ${a[0]}: no such directory`);cwd=p},
+  cat(a){for(const x of fl(a)){const n=get(N(x));if(!n||n.t!='f')pr(`cat: ${x}: no such file`);else n.d.split('\n').forEach(pr)}},
+  mkdir(a){for(const x of fl(a))if(!put(N(x),dir()))pr(`mkdir: ${x}: cannot create directory`)},
+  touch(a){for(const x of fl(a))if(!get(N(x))&&!put(N(x),file('')))pr(`touch: ${x}: cannot create file`)},
+  rm(a){for(const x of fl(a))if(!trashIt(N(x)))pr(`rm: ${x}: no such file or directory`)},
+  ps(){pr('ID   NAME');for(const x of wins.values())pr(String(x.id).padEnd(5)+x.A.title)},
+  taskmgr(){openApp('taskmgr')},top(){openApp('taskmgr')},
+  notepad(a){openApp('notepad',a.length?{path:N(a.join(' '))}:{})},
+  sfc(a){const r=runVirtualSfc(a);r.split('\n').forEach(pr)},
+  kill(a){const x=wins.get(+fl(a)[0]);x?closeW(x):pr('kill: no such process')},
+  reg(){const walk=(o,p)=>{for(const[k,v]of Object.entries(o))typeof v=='object'?walk(v,p+'\\'+k):pr(p+'  '+k+' = '+v)};walk(S.reg,'')},
+  crash(){bsod('MANUALLY_INITIATED_CRASH','shell: crash')},recovery(){power('rec')},
+  start(a){const k=a[0]=='shell'?'cmd':a[0];APPS[k]?openApp(k):pr('usage: start explorer|shell|notepad|taskmgr|settings|regedit|bin')},
+  exit(){closeW(w)}};
+ C.version=C.ver;
+ inp.onkeydown=e=>{if(!coarse&&(e.key=='Process'||e.isComposing))return;
+  if(e.key=='Enter'){const l=inp.value.trim();inp.value='';pr(ps.textContent+l);if(l){hist.push(l);hi=hist.length;const[c,...a]=shellArgs(l),f=C[String(c||'').toLowerCase()];f?f(a):pr(`jshell: ${c}: command not found`)}pmt();T.scrollTop=T.scrollHeight}
+  else if(e.key=='ArrowUp'){hi=Math.max(0,hi-1);inp.value=hist[hi]||'';e.preventDefault()}
+  else if(e.key=='ArrowDown'){hi=Math.min(hist.length,hi+1);inp.value=hist[hi]||''}};
+ T.onclick=()=>inp.focus();setTimeout(()=>inp.focus(),0)}};
+APPS.explorer={title:'エクスプローラー',icon:'folder',size:[820,460],init(w,a={}){
+ let p=a.path||home(),sel=null,bin=!!a.bin;const open=new Set(),ex=z=>{let s='';for(const x of seg(z)){s+=(s?'/':'')+x;open.add(s)}};ex(p);if(bin)w.title('ごみ箱');
+ const B=w.body,q=s=>B.querySelector(s);
+ B.innerHTML=`<div class=bar><button data-c=up>${ico('arrow_upward')}</button><input class=addr readonly><button data-c=nd>${ico('create_new_folder')}</button><button data-c=nf>${ico('note_add')}</button><button data-c=del>${ico('delete')}</button><button data-c=rs>${ico('restore_from_trash')}</button><button data-c=em>${ico('delete_forever')}</button></div><div class=xp><div class="side tr"></div><div class=list></div></div>`;
+ const kids=pp=>{const n=get(pp);return n&&n.t=='d'?Object.entries(n.c).sort(([x,m],[y,k])=>(k.t=='d')-(m.t=='d')||x.localeCompare(y)).map(([k,v])=>[k,v.t=='d']):[]},
+ mk=(n,d,pp,line,o)=>`<div class="tl ${!bin&&pp==p?'on':''}" data-t="${esc(pp)}" data-d=${d?1:0}><span class=tp>${line}</span>${ico(d?(o?'folder_open':'folder'):'insert_drive_file')}<span>${esc(n)}</span></div>`;
+ const render=()=>{sel=null;q('.addr').value=bin?'ごみ箱':disp(p);
+  let h='';
+  if(bin)h=S.trash.map((t,i)=>`<div class=it data-i=${i}>${ico(t.node.t=='d'?'folder':'insert_drive_file')}<span>${esc(t.n)}</span></div>`).join('')||'<p class=em>ごみ箱は空です</p>';
+  else{const n=get(p);if(!n||n.t!='d'){p=par(p);return render()}
+   h=kids(p).map(([k,d])=>`<div class=it data-n="${esc(k)}">${ico(d?'folder':'insert_drive_file')}<span>${esc(k)}</span></div>`).join('')||'<p class=em>このフォルダーは空です</p>'}
+  q('.side').innerHTML=`<div class="tl ${!bin&&p==''?'on':''}" data-t="" data-d=1>${ico('storage')}<span>C:/</span></div>`+treeHTML(kids,mk,open)+`<div class="tl ${bin?'on':''}" data-bin=1>${ico('delete')}<span>ごみ箱</span></div>`;
+  q('.list').innerHTML=h;for(const k of['up','nd','nf'])q(`[data-c=${k}]`).hidden=bin;for(const k of['rs','em'])q(`[data-c=${k}]`).hidden=!bin};
+ B.onclick=e=>{const t=e.target.closest('.tl'),it=e.target.closest('.it'),c=e.target.closest('[data-c]');
+  if(t){if(t.dataset.bin){bin=true;w.title('ごみ箱')}else if(t.dataset.d=='1'){const d=t.dataset.t;bin=false;w.title('エクスプローラー');if(d==p&&open.has(d))open.delete(d);else ex(d);p=d}else{const f=get(t.dataset.t);if(f&&f.t==='f'){openApp('notepad',{path:t.dataset.t});return}return}render();return}
+  if(it){B.querySelectorAll('.it.on').forEach(x=>x.classList.remove('on'));it.classList.add('on');sel=it;return}
+  if(!c)return;const k=c.dataset.c;
+  if(k=='up'){p=par(p);render()}
+  if(k=='nd'||k=='nf'){const n=prompt(k=='nd'?'フォルダー名':'ファイル名');if(n&&!/[\\/]/.test(n)){put(p+'/'+n,k=='nd'?dir():file(''));ex(p);render()}}
+  if(k=='del'&&sel){if(bin){S.trash.splice(+sel.dataset.i,1);save();dbin()}else trashIt(p+'/'+sel.dataset.n);render()}
+  if(k=='rs'&&sel){const t=S.trash[+sel.dataset.i];if(!put(t.from,t.node))put(home()+'/'+t.n,t.node);S.trash.splice(+sel.dataset.i,1);save();dbin();render()}
+  if(k=='em'){S.trash=[];save();dbin();render()}};
+ let pressTimer=0,pressStart=null;
+ const cancelLong=()=>{clearTimeout(pressTimer);pressTimer=0;pressStart=null};
+ B.addEventListener('pointerdown',e=>{const it=e.target.closest('.it');if(!it||bin||!it.dataset.n||e.button===2)return;cancelLong();pressStart={x:e.clientX,y:e.clientY,id:it};pressTimer=setTimeout(()=>{if(pressStart&&pressStart.id.isConnected){const pp=p+'/'+pressStart.id.dataset.n;showFileContext(pp,e.clientX,e.clientY)}pressTimer=0},560)});
+ B.addEventListener('pointermove',e=>{if(pressStart&&Math.hypot(e.clientX-pressStart.x,e.clientY-pressStart.y)>12)cancelLong()});
+ B.addEventListener('pointerup',cancelLong);B.addEventListener('pointercancel',cancelLong);
+ B.oncontextmenu=e=>{const it=e.target.closest('.it');if(!it||bin||!it.dataset.n)return;e.preventDefault();cancelLong();showFileContext(p+'/'+it.dataset.n,e.clientX,e.clientY)};
+ B.ondblclick=e=>{cancelLong();const it=e.target.closest('.it');if(!it||bin)return;const path=p+'/'+it.dataset.n,n=get(path);if(!n)return;if(n.t==='d'){p=path;ex(p);render()}else openFile(path)};
+ render()}};
+APPS.taskmgr={title:'タスク マネージャー',icon:'monitor_heart',single:true,size:[800,440],init(w){
+ const B=w.body;B.innerHTML=`<div class="tm-toolbar"><button data-c=refresh>${ico('refresh')}更新</button><span class=em>JShell GUI 上の仮想アプリのみを管理します</span><span class="tm-summary"></span></div><div class="tm-table-wrap"></div><div class=em>アプリの「タスクの終了」は対応するウィンドウを閉じます。実際のPCプロセスには影響しません。</div>`;
+ const summary=B.querySelector('.tm-summary'),wrap=B.querySelector('.tm-table-wrap');let timer=0;
+ const render=()=>{if(!w.el.isConnected)return;const list=[...wins.values()].sort((a,b)=>a.id-b.id);summary.textContent=`${list.length} 個のタスク`;wrap.innerHTML=`<table class="tm-table"><thead><tr><th>PID</th><th>アプリ</th><th>状態</th><th>操作</th></tr></thead><tbody>${list.map(x=>`<tr><td>${x.id}</td><td>${esc(x.A.title)}</td><td>実行中</td><td><button data-end="${x.id}" ${x.id===w.id?'title="このタスクを終了できます"':''}>タスクの終了</button></td></tr>`).join('')}</tbody></table>`};
+ B.onclick=e=>{if(e.target.closest('[data-c=refresh]'))render();const b=e.target.closest('[data-end]');if(b){const id=+b.dataset.end;if(id===w.id){closeW(w);return}const target=wins.get(id);if(target)closeW(target);render()}};
+ render();timer=setInterval(()=>{if(!w.el.isConnected){clearInterval(timer);return}render()},1800)
+}};
+function runVirtualSfc(args){
+ const cfg=S.sfc||(S.sfc={enabled:true,cacheSize:256,corrupt:[],cachePurged:false,offline:{bootdir:'',windir:''}});cfg.offline||(cfg.offline={bootdir:'',windir:''});const files=['C:\\Windows\\System32\\kernel32.dll','C:\\Windows\\System32\\ntdll.dll','C:\\Windows\\System32\\user32.dll','C:\\Windows\\System32\\drivers\\etc\\hosts'];
+ const canon=x=>String(x||'').replace(/^\\\\\?\\/,'').replaceAll('/','\\').replace(/\\+/g,'\\').toLowerCase(),stat=p=>{const k=canon(p),f=files.find(x=>canon(x)===k);if(f)return {key:k,path:f};const n=get(p);return n&&n.t==='f'?{key:'vfs:'+norm(p,home()).toLowerCase(),path:norm(p,home())}:null};
+ if(args.some(x=>['--help','-h','/?'].includes(String(x).toLowerCase())))return 'sfc — virtual System File Checker\n\nUSAGE\n  sfc /scannow\n  sfc /verifyonly\n  sfc /scanfile=<FILE>\n  sfc /verifyfile=<FILE>\n  sfc /cancel\n  sfc /enable\n  sfc /purgecache\n  sfc /cachesize=<SIZE_MB>\n  sfc /offbootdir=<DIR> /offwindir=<DIR> /scannow\n\nOnly the JShell virtual catalog is checked; the host operating system is never modified.';
+ if(!args.length)return 'sfc: missing option. Try sfc --help';
+ let op='',file='',bad='',cache=undefined,offlineBoot='',offlineWin='';for(let i=0;i<args.length;i++){const x=String(args[i]),l=x.toLowerCase();if(['/scannow','/verifyonly','/cancel','/enable','/purgecache'].includes(l)){if(op&&op!==l)return `sfc: conflicting options ${op} and ${l}`;op=l}
+ else if(l.startsWith('/scanfile=')||l==='/scanfile'){op='/scanfile';file=x.includes('=')?x.slice(x.indexOf('=')+1):args[++i]||''}
+ else if(l.startsWith('/verifyfile=')||l==='/verifyfile'){op='/verifyfile';file=x.includes('=')?x.slice(x.indexOf('=')+1):args[++i]||''}
+ else if(l.startsWith('/cachesize=')||l==='/cachesize'){cache=x.includes('=')?x.slice(x.indexOf('=')+1):args[++i];if(!/^\d+$/.test(String(cache))||+cache>65536)return 'sfc: /cachesize requires an integer from 0 to 65536 MB'}
+ else if(l.startsWith('/offbootdir=')||l==='/offbootdir')offlineBoot=x.includes('=')?x.slice(x.indexOf('=')+1):args[++i]||'';
+ else if(l.startsWith('/offwindir=')||l==='/offwindir')offlineWin=x.includes('=')?x.slice(x.indexOf('=')+1):args[++i]||'';
+ else bad=x}
+ if(bad)return `sfc: unknown option ${bad}. Try sfc --help`;
+ if(cache!==undefined){cfg.cacheSize=+cache;save();return `Virtual file-protection cache size set to ${cfg.cacheSize} MB. No host system setting was changed.`}
+ if(op==='/enable'){cfg.enabled=true;save();return 'Windows Resource Protection (virtual) is enabled.'}
+ if(op==='/purgecache'){cfg.cachePurged=true;save();return 'Simulated file-protection cache cleared. No host files were changed.'}
+ if(op==='/cancel')return 'There is no pending scan to cancel; this simulation scans synchronously.';
+ if(!op)return 'sfc: missing scan option. Try sfc --help';if(!cfg.enabled)return 'Windows Resource Protection is disabled. Run sfc /enable first.';
+ if((offlineBoot||offlineWin)&&(!offlineBoot||!offlineWin))return 'sfc: offline scans require both /offbootdir=DIR and /offwindir=DIR';
+ const banner='JShell virtual System File Checker\nNote: This does not inspect or repair your real Windows installation.\n';
+ const corrupt=Array.isArray(cfg.corrupt)?cfg.corrupt:[];
+ if(op==='/scanfile'||op==='/verifyfile'){if(!file)return 'sfc: '+op+' requires a file path';const f=stat(file);if(!f)return banner+`Windows Resource Protection could not perform the requested operation: ${file} is not in the virtual protected-file catalog.`;const b=corrupt.includes(f.key);if(b&&op==='/scanfile'){cfg.corrupt=corrupt.filter(x=>x!==f.key);save();return banner+`${f.path}: corrupt virtual file repaired from the simulated cache.`}return banner+`${f.path}: ${b?'integrity violations found':'no integrity violations found'}${b?' (verification only)':''}.`}
+ if(op==='/scannow'&&corrupt.length){cfg.corrupt=[];save();return banner+'Beginning system scan.\nVerification 100% complete.\nWindows Resource Protection found corrupt files and successfully repaired them in the virtual catalog.'}
+ if(op==='/verifyonly'&&corrupt.length)return banner+`Verification 100% complete.\nWindows Resource Protection found integrity violations in ${corrupt.length} virtual protected file(s). No repairs were made.`;
+ if(op!='/scannow'&&op!='/verifyonly')return 'sfc: unsupported combination of options';save();return banner+'Beginning system scan.\nVerification 100% complete.\nWindows Resource Protection did not find any integrity violations.'+((offlineBoot&&offlineWin)?'\nOffline mode: '+offlineBoot+' / '+offlineWin:'')
+}
+function openFile(path){const n=get(path);if(!n)return;if(n.t==='d'){openApp('explorer',{path});return}if(/\.html?$/i.test(nm(path)))openApp('htmlapp',{path});else openApp('notepad',{path})}
+function runHtmlInNewTab(path){const n=get(path);if(!n||n.t!=='f'){MsgBox('HTML ファイルを読み込めません');return}const child=window.open('about:blank','_blank');if(!child){MsgBox('新しいタブがブロックされました。ポップアップを許可してください。');return}child.document.title=nm(path)+' - JShell HTML';child.document.body.style.cssText='margin:0;background:#fff';const frame=child.document.createElement('iframe');frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;background:white';frame.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups');child.document.body.appendChild(frame);frame.srcdoc=n.d||''}
+let contextFilePath='';
+function showFileContext(path,x,y){const n=get(path);if(!n||n.t!=='f')return;contextFilePath=path;const c=$('#ctx'),isHtml=/\.html?$/i.test(nm(path));c.innerHTML=`<div class="file-ctx-note">${esc(nm(path))}</div><button data-file-action="edit">${ico('edit')}メモ帳で編集</button>${isHtml?`<button data-file-action="tab">${ico('open_in_new')}別タブで実行</button><button data-file-action="window">${ico('web_asset')}ウィンドウで実行</button>`:''}`;c.style.left=Math.max(4,Math.min(x,innerWidth-210))+'px';c.style.top=Math.max(4,Math.min(y,innerHeight-(isHtml?165:95)))+'px';c.classList.remove('hide')}
+function fileContextAction(action){const path=contextFilePath;$('#ctx').classList.add('hide');if(!path)return;if(action==='edit')openApp('notepad',{path});if(action==='tab')runHtmlInNewTab(path);if(action==='window')openApp('htmlapp',{path})}
+APPS.htmlapp={title:'HTML 実行',icon:'code',size:[900,580],init(w,a={}){let path=a.path||'';const B=w.body,n=get(path);w.title((nm(path)||'HTML')+' — ウィンドウで実行');B.innerHTML=`<div class=bar><span class=em>サンドボックス実行 · ${esc(path)}</span><span class=sp></span><button data-c=refresh>${ico('refresh')}再読み込み</button><button data-c=tab>${ico('open_in_new')}別タブで実行</button></div><iframe class=html-frame title="${esc(nm(path)||'HTML preview')}" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>`;const f=B.querySelector('iframe');f.srcdoc=n&&n.t==='f'?(n.d||''):'<h2>HTML ファイルが見つかりません</h2>';B.onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;const current=get(path);if(b.dataset.c==='refresh')f.srcdoc=current?.d||'';if(b.dataset.c==='tab')runHtmlInNewTab(path)}}};
+APPS.bin={title:'ごみ箱',icon:'delete',single:true,size:[560,380],init(w){APPS.explorer.init(w,{bin:1})}};
+APPS.notepad={title:'メモ帳',icon:'description',size:[520,360],init(w,a={}){let path=a.path||'';const B=w.body;
+ B.innerHTML=`<div class=bar><button data-c=s>${ico('save')}保存</button></div><textarea spellcheck=false></textarea>`;const t=B.querySelector('textarea');
+ if(path){const n=get(path);t.value=n?.d||'';w.title(nm(path)+' - メモ帳')}
+ B.querySelector('[data-c=s]').onclick=()=>{if(!path){const n=prompt('ファイル名（ドキュメントに保存）','新しいテキスト.txt');if(!n||/[\\/]/.test(n))return;path=home()+'/Documents/'+n;w.title(n+' - メモ帳')}
+  const f=get(path);f&&f.t=='f'?(f.d=t.value,save()):put(path,file(t.value))}}};
+APPS.settings={title:'設定',icon:'settings',single:true,size:[760,480],init(w){const B=w.body;B.innerHTML='<div class=xp><div class="side set"></div><div class="list pg"></div></div>';let page='p';
+ const NAV=[['p','palette','個人用設定'],['a','person','アカウント'],['s','info','システム情報'],['b','memory','ブートとUEFI']],SW=a=>a.map(c=>`<i class=sw style="background:${c}" data-v="${c}"></i>`).join('');
+ const render=()=>{B.querySelector('.set').innerHTML=NAV.map(([k,i,n])=>`<button data-k=${k} class="${k==page?'on':''}">${ico(i)}${n}</button>`).join('');const g=B.querySelector('.pg');
+  if(page=='p')g.innerHTML=`<h3>テーマ</h3><button data-t=dark>${ico('dark_mode')}ダーク</button><button data-t=light>${ico('light_mode')}ライト</button><h3>アクセントカラー</h3><div data-x=Accent>${SW(['#0078d4','#e81123','#107c10','#ff8c00','#8e24aa','#00b7c3'])}</div><h3>壁紙</h3><div data-x=Wallpaper>${SW(['#0b3d91','#1b5e20','#4a148c','#b71c1c','#263238','#004d40'])}</div>`;
+  if(page=='a')g.innerHTML=`<h3>${esc(S.user)}</h3><p>パスワード: ${S.pass?'設定済み':'なし'}</p><input id=np type=password placeholder=新しいパスワード> <button data-c=pw>${ico('key')}変更</button> <button data-c=nopw>パスワードを削除</button>`;
+  if(page=='s')g.innerHTML=`<h3>JShell GUI 2.0.0</h3><p>ブラウザ: ${esc(navigator.userAgent)}</p><p>画面: ${screen.width}x${screen.height}</p><p>論理CPU: ${navigator.hardwareConcurrency||'?'}</p><p>保存データ: ${(JSON.stringify(S).length/1024).toFixed(1)} KB</p><button data-c=reset class=danger>${ico('warning')}初期化（全データ削除）</button>`;
+  if(page=='b')g.innerHTML=`<p>UEFI設定はレジストリ HKLM\\SYSTEM\\Boot に保存されます。</p><button data-c=fw>${ico('memory')}UEFIファームウェア設定へ再起動</button> <button data-c=rec>${ico('build')}回復環境へ再起動</button>`};
+ B.onclick=async e=>{const t=e.target.closest('button,.sw');if(!t)return;const d=t.dataset;
+  if(d.k){page=d.k;render()}else if(d.t){RK().Theme=d.t;save();apply()}else if(d.v){RK()[t.parentNode.dataset.x]=d.v;save();apply()}
+  else if(d.c=='pw'){const v=B.querySelector('#np').value;if(v){S.pass=await hash(v);save();render()}}
+  else if(d.c=='nopw'){S.pass=null;save();render()}
+  else if(d.c=='reset'){MsgBox('すべてのデータを削除して初期化します。よろしいですか？','確認',['キャンセル','削除']).then(v=>{if(v==='削除'){localStorage.removeItem(KEY);location.reload()}})}
+  else if(d.c=='fw')power('fw');else if(d.c=='rec')power('rec')};
+ render()}};
+APPS.regedit={title:'レジストリ エディター',icon:'account_tree',size:[820,460],init(w){const B=w.body,open=new Set(),ex=z=>{let s='';for(const x of seg(z)){s+=(s?'/':'')+x;open.add(s)}};let path='';
+ B.innerHTML=`<div class=bar><button data-c=nv>${ico('add')}値</button><button data-c=nk>${ico('create_new_folder')}キー</button><button data-c=dk>${ico('delete')}キー削除</button><span class=sp></span><span class=em></span></div><div class=xp><div class="side tr"></div><div class="list vals"></div></div>`;
+ const kids=pp=>{const o=pp?regAt(pp):S.reg;return o?Object.entries(o).filter(([,v])=>typeof v=='object').map(([k])=>[k,true]):[]},
+ mk=(n,d,pp,line,o)=>`<div class="tl ${pp==path?'on':''}" data-t="${esc(pp)}"><span class=tp>${line}</span>${ico(o?'folder_open':'folder')}<span>${esc(n)}</span></div>`,J=x=>x.replace(/\//g,'\\');
+ const render=()=>{const bad=new Set(badReg()),o=path?regAt(path):null;
+  B.querySelector('.side').innerHTML=`<div class=tl>${ico('computer')}<span>コンピューター</span></div>`+treeHTML(kids,mk,open);
+  B.querySelector('.vals').innerHTML=o?Object.entries(o).filter(([,v])=>typeof v!='object').map(([k,v])=>`<div class="it ${bad.has(path+'/'+k)?'bad':''}" data-k="${esc(k)}">${ico(bad.has(path+'/'+k)?'error':'tune')}<span>${esc(k)}</span><span class=v>${esc(v)}</span></div>`).join('')||'<p class=em>値がありません</p>':'<p class=em>キーを選択してください</p>';
+  B.querySelector('.bar .em').textContent=J(path)};
+ B.onclick=e=>{const t=e.target.closest('.tl'),it=e.target.closest('.it'),c=e.target.closest('[data-c]');
+  if(t){const d=t.dataset.t;if(d==null)return;if(d==path&&open.has(d))open.delete(d);else ex(d);path=d;render();return}
+  const o=path?regAt(path):null;
+  if(it&&o){const k=it.dataset.k;InputBox(J(path)+'\\'+k+' の値',o[k]).then(v=>{if(v!==null){o[k]=v;save();if(chk())return;apply();render()}});return}
+  if(!c||!o)return;const k=c.dataset.c;
+  if(k=='nv'){InputBox('値の名前').then(n=>{if(n){o[n]='';save();render()}})}
+  if(k=='nk'){const n=prompt('キー名');if(n&&!/[\\/]/.test(n)){o[n]={};ex(path+'/'+n);save();render()}}
+  if(k=='dk'&&path.includes('/')&&confirm('キーを削除しますか？')){const i=path.lastIndexOf('/'),pp=path.slice(0,i);delete regAt(pp)[path.slice(i+1)];path=pp;save();if(chk())return;apply();render()}};
+ render()}};
+addEventListener('error',e=>{if(e.message&&e.message!='Script error.')bsod('SYSTEM_THREAD_EXCEPTION_NOT_HANDLED',((e.filename||'gui.html').split('/').pop())+': '+e.message)});
+addEventListener('unhandledrejection',e=>bsod('KERNEL_SECURITY_CHECK_FAILURE',String((e.reason&&e.reason.message)||e.reason)));
+apply();boot();
+document.fonts&&document.fonts.load('20px "Material Icons"','close').then(f=>{if(!f.length)document.documentElement.classList.add('noicon')}).catch(()=>document.documentElement.classList.add('noicon'));
+</script></body></html>
